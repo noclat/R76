@@ -142,11 +142,11 @@ Note: GET parameters will be rewrited from `?key=value&key2=value2` to `/key:val
 # Helpers and R76 public methods
 Some values and functions are avaiable to manipulate anything related to URLs and template files. Those functions are avaible in all your files.
 
-<a name=“root-helper”/>
+<a name="root-helper"/>
 ## root() or R76::root()
 Returns the complete adress of your website.
 
-<a name=“url-helper”/>
+<a name="url-helper"/>
 ## url() or R76::url() 
 ### 0 parameter
 Returns the complete current url.
@@ -173,15 +173,15 @@ Returns the absolute url, adding the parameters.
 
 will return `//yourdomain.com/article/read/4/showcomments:true/commentspage:1`.
 
-<a name=“verb-helper”/>
+<a name="verb-helper"/>
 ## verb() or R76::verb()
 Returns the current verb (GET, POST, PUT, DELETE).
 
-<a name=“uri-helper”/>
+<a name="uri-helper"/>
 ## uri() or R76::uri()
 Returns the current URI, which is the URL freed from root and GET parameters.
 
-<a name=“path-helper”/>
+<a name="path-helper"/>
 ## path($key) or R76::path($key)
 If `$key` is a string, it returns the value of the variable set in the root:
 	
@@ -194,33 +194,33 @@ If `$key` is numeric, it returns the nth part (zero-based) of the URI.
 	// current uri: articles/read/134/
 	echo path(2); // will return ‘134’
 	
-<a name=“param-helper”/>
+<a name="param-helper"/>
 ## param($key) or R76::param($key)
 Return the value of the GET parameter `$key`.
 
 	// current url: articles/tag:webdesign
 	echo param(‘tag’); // will return ‘webdesign’
 	
-<a name=“params-helper”/>
+<a name="params-helper"/>
 ## params() or R76::params()
 Return an associative array of the GET parameters, strickly he same as `$_GET` values.
 
-<a name=“arg-helper”/>
+<a name="arg-helper"/>
 ## arg($key) or R76::arg($key)
 Return the value of the argument `$key` set in the ROUTE command macthing the current URL.
 	
 	// config: ROUTE GET /articles/@id site/templates/read type:article
 	echo arg(‘type’); // will return ‘article’
 	
-<a name=“args-helper”/>
+<a name="args-helper"/>
 ## args() or R76::args()
 Return an associative array of the arguments set in the ROUTE command macthing the current URL.
 
-<a name=“ui-helper”/>
+<a name="ui-helper"/>
 ## ui() or R76::ui()
 Return the UI path value set in the configuration.
 
-<a name=“render-helper”/>
+<a name="render-helper"/>
 ## render($filename(, $data)) or R76::render($filename(, $data))
 Include the file situated in the UI folder. You don’t need to specify the `.php` extension, and you can call files located in a subdirectory. In the example provided in this repository:
 
@@ -246,10 +246,10 @@ They will be extracted as native variables which are only available on that spec
 	</body>
 	</html>
 	
-<a name=“async-helper”/>
+<a name="async-helper"/>
 ## async()
 Returns true if you’re using an AJAX request, and false if not. What defines an AJAX request is the value of the `X_REQUESTED_WITH` set to `XMLHttpRequest`, used in nearly all of the JavaScript libraries that send AJAX requests.
 
-<a name=“go-helper”/>
+<a name="go-helper"/>
 ## go($location)
 Redirect to the specified url. If `$location` parameter is ommited, it will refresh the current page, using `url()` value.
