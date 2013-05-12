@@ -38,7 +38,7 @@ The source is an example of use. If you want to start from scratch, just remove 
 	site/core/r76.php
 	site/core/helpers.php
 			
-You can relocate the `r76.php` and `helpers.php` files. Start creating an `index.php` file at the top level, and a config file named as you want. Don’t forget to update the protected directory path on the `.htaccess`.
+You can relocate the `r76.php` and `helpers.php` files. Start creating an `index.php` file at the top level. Don’t forget to update the protected directory path on the `.htaccess`.
 
 
 # Load the system
