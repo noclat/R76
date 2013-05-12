@@ -1,5 +1,5 @@
 <?php
-#	R76 by Nicolas Torres (76.io), CC BY-SA license: creativecommons.org/licenses/by-sa/3.0
+# R76 by Nicolas Torres (76.io), CC BY-SA license: creativecommons.org/licenses/by-sa/3.0
   final class base {
     private static $instance;
     private $root, $verb, $path = array(), $params = array(), $args = array(), $callback = false, $ui;
