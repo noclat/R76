@@ -1,8 +1,9 @@
 # R76 router
-R76 is a light-weight PHP framework that can hold any kind of project. It only provides [a router](site/core/) and an extended config file to help the files tree and code organization. You still the real master of your project, since R76 is optimized for both procedural or POO environments, and does not require any specific intern organization. Just make sure the `.htaccess` paths are correct.
+R76 is a light-weight PHP framework that can hold any kind of project. It only provides [a router](site/core/) and an extended config file to help the files tree and code organization. You still the real master of your project, since R76 is optimized for both procedural or POO environments, and does not require any specific intern organization. Just make sure the `.htaccess` paths are correct. 
 
-R76 is shared under a [CC BY-SA license](http://creativecommons.org/licenses/by-sa/3.0).
+R76 is shared under a [CC BY-SA license](http://creativecommons.org/licenses/by-sa/3.0). 
 
+See [Eye Fracture source](http://github.com/noclat/eyefracture) to get an advanced exemple of R76 usage.
 
 # Documentation
 - [Load the system](#load-the-system)
