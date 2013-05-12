@@ -1,5 +1,5 @@
 <?php if (path('section')) go(url('404')) ?>
-<?php render('snippets/header', array(
+<?php render(ui.'snippets/header', array(
   'title'       => 'Home',
   'description' => ''
   )) ?>
@@ -12,4 +12,4 @@
   
   
 
-<?php render('snippets/footer') ?>
+<?php include ui.'snippets/footer.php' ?>

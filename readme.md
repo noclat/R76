@@ -1,14 +1,14 @@
 # R76 router
-R76 is a light-weight PHP framework that can hold any kind of project. It only provides [a router](site/core/) and an extended config file to help the files tree and code organization. You still the real master of your project, since R76 is optimized for both procedural or POO environments, and does not require any specific intern organization or design pattern. Just make sure the `.htaccess` paths are correct. 
+R76 is a light-weight PHP framework that can hold any kind of project. It only provides [a router](site/core/) and an extended config file to help the files tree and code organization. You still the real master of your project, since R76 is optimized for both procedural or POO environments, and does not require any specific intern organization or design pattern.
 
 R76 is shared under a [CC BY-SA license](http://creativecommons.org/licenses/by-sa/3.0). 
 
 See [Eye Fracture source](http://github.com/noclat/eyefracture.com) to get an advanced exemple of R76 usage.
 
 # Documentation
+- [Start](#start)
 - [Load the system](#load-the-system)
 - [Configuration file](#configuration-file)
-  - [UI](#ui)
   - [LOAD](#load)
   - [ROUTE](#route)
   - [DEFINE](#define)
@@ -27,10 +27,19 @@ See [Eye Fracture source](http://github.com/noclat/eyefracture.com) to get an ad
   - [params() or R76::params()](#params-helper)
   - [arg() or R76::arg()](#arg-helper)
   - [args() or R76::args()](#args-helper)
-  - [ui() or R76::ui()](#ui-helper)
-  - [render() or R76::render()](#render-helper)
   - [async()](#async-helper)
   - [go()](#go-helper)
+
+
+# Start
+The source is an example of use. If you want to start from scratch, just remove anything but those files:
+	
+	.htaccess
+	site/core/r76.php
+	site/core/helpers.php
+			
+You can relocate the `r76.php` and `helpers.php` files. Start creating an `index.php` file at the top level, and a config file named as you want. Don’t forget to update the protected directory path on the `.htaccess`.
+
 
 # Load the system
 The index.php needs to load the system. Here is an example of what it should looks like:
@@ -44,18 +53,14 @@ The `config()` method could be called using both an array of commands or a file 
 The `run()` method displays the result, and gets a callback in parameter, called when the URL doesn’t match any route configuration. See the [Callbacks section](#callbacks) below to know more about what is posssible to do with.
 
 # Configuration file
-The syntax is pretty simple: ‘command parameters’, one command per line, and you can comment a line by starting it with a ‘#’. Commands available: **LOAD**, **UI**, **ROUTE**, **DEFINE**, **CUSTOM**. This is a sample config file:
+The syntax is pretty simple: ‘command parameters’, one command per line, and you can comment a line by starting it with a ‘#’. Commands available: **LOAD**, **ROUTE**, **DEFINE**, **CUSTOM**. This is a sample config file:
 
   # System
 		LOAD    site/core
-		UI      site/templates
 
 	# Routes
 		ROUTE   GET       /               site/templates/default
 		ROUTE   GET       /@section       site/templates/@section
-
-## UI
-Defines the path to the template files. It’s required if you want to use the inner [render system](#render-helper) (and trust me, you do want).
 
 ## LOAD
 Loads all the php files located in the given folder path. You can set multiple folders to load, simply use the ‘;’ separator. E.g.:
@@ -120,7 +125,7 @@ If any spreadsheet url changes, we only have to update the config file, without 
 
 # Tips
 ## Syntax sensibility
-Any path you’ll have to write (in url() and render() functions and the configuration file) are parsed to prevent from any bug occuring with the ‘slash’ character confusing use. So you can both write `/path/` or `path/`, and even `path`.
+Any path you’ll have to write (in url() function and the configuration file) are parsed to prevent from any bug occuring with the ‘slash’ character confusing use. So you can both write `/path/` or `path/`, and even `path`. Paths on DEFINE values and CUSTOM parameters aren’t parsed.
 
 In the configuration command lines, you can use as much inline spacing/tabs characters as you want between the values, and around ‘;’ separators. You are **not** allowed to put spaces when combining ROUTE verbs (GET, POST, PUT, DELETE).
 
@@ -128,10 +133,8 @@ Commands are not case sensitive, but paths are.
 
 The URLs could be write both **with or without any extension**. `//example.com/sitemap` and `//example.com/sitemap.xml` are equaly regarded by the framework.
 
-Any PHP file you call using in the render() function or the configuration file doesn’t need the `.php` extension. 
-
 ## Callbacks
-Callbacks could be files, functions or methods. If it’s a file, it will just be included (and executed). If it’s a function or a method, just give the name, without the parenthesis. Examples: `load`, `article->read`, `articles::read`.
+Callbacks could be files, functions or methods. If it’s a file, it will just be included (and executed) — you don’t need to specify the `.php` extension —. If it’s a function or a method, just give the name, without the parenthesis. Examples: `load`, `article->read`, `articles::read`.
 
 ## GET parameters
 GET parameters aren’t part of the route. Any The callback of `/articles/archives` url and `/articles/archives/sort:year%20asc` will be the same. You can access those parameters in your code to make changes according to their values.
@@ -215,31 +218,6 @@ Return the value of the argument `$key` set in the ROUTE command macthing the cu
 <a name="args-helper"/>
 ## args() or R76::args()
 Return an associative array of the arguments set in the ROUTE command macthing the current URL.
-
-<a name="ui-helper"/>
-## ui() or R76::ui()
-Return the UI path value set in the configuration.
-
-<a name="render-helper"/>
-## render($filename(, $data)) or R76::render($filename(, $data))
-Include the file situated in the UI folder. You don’t need to specify the `.php` extension, and you can call files located in a subdirectory. In the example provided in this repository:
-
-	render(‘default’); // includes ‘site/templates/default.php’
-	render(‘snippets/header’); // includes ‘site/templates/snippets/header.php’
-
-You can pass data as an associative array to the included file: 
-
-	render(‘snippets/header’, array(
-		‘title’ => ‘Eye Fracture’,
-		‘description’ => ‘Discover the best trailers and cutscenes of your favorite games, all in one place.’
-	));
-
-They will be extracted as native variables which are only available on that specific file. So, in ‘site/templates/snippets/header.php’, we can use those information like this:
-
-	<head>
-		<title><?php echo $title ?></title>
-		<meta name=“description” value=“<?php echo $description ?>”>
-	</head>
   
 <a name="async-helper"/>
 ## async()

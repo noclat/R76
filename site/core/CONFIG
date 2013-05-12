@@ -1,8 +1,11 @@
 # System
   LOAD    site/core
-  UI      site/templates
 
 
 # Routes
-  ROUTE   GET       /               site/templates/default
-  ROUTE   GET       /@section       site/templates/@section
+  ROUTE   GET     /               site/templates/default
+  ROUTE   GET     /@section       site/templates/@section
+  
+
+# Constants
+  DEFINE  ui      site/templates/

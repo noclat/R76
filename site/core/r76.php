@@ -2,7 +2,7 @@
 # R76 by Nicolas Torres (76.io), CC BY-SA license: creativecommons.org/licenses/by-sa/3.0
   final class base {
     private static $instance;
-    private $root, $verb, $path = array(), $params = array(), $args = array(), $callback = false, $ui;
+    private $root, $verb, $path = array(), $params = array(), $args = array(), $callback = false;
 
   # Init
     function __construct() {
@@ -22,7 +22,6 @@
       $param = trim(strstr($param, ' '));
       switch (strtolower($cmd)) {
         case 'load': $this->load(array_map(array(__CLASS__, 'cleanPath'), explode(';', $param))); break;
-        case 'ui': $this->ui = $this->cleanPath($param).'/'; break;
         case 'route': $this->route($param); break;
         case 'define': define(strstr($param, ' ', true), trim(strstr($param, ' '))); break;
         case 'custom': $this->call(strstr($param, ' ', true), preg_split('/\h+/', trim(strstr($param, ' ')))); break;
@@ -39,7 +38,6 @@
     function params() { return $this->params; }
     function arg($k) { return $this->args[$k]; }
     function args() { return $this->args; }
-    function ui() { return $this->ui; }
 
   # Get complete current|custom URL
     function url($path = false, $params = array()) {
@@ -47,13 +45,6 @@
       elseif (!$path) $params = $this->params;
       $path = ($path AND !is_array($path)) ? $this->cleanPath($path) : $this->uri();
       return $this->root.$this->cleanPath(implode('/', array_merge((array)$path, array_map(function($k, $v) { return $k.':'.urlencode($v); }, array_keys($params), $params))));
-    }
-
-  # Render template
-    function render($file, $data = array()) {
-      $file = $this->cleanPath($file);
-      if (!is_file($f = $this->ui().$file.'.php') AND !is_file($f = $this->ui().$file.'.html')) throw new Exception('Render — Unexisting file: '.$f);
-      extract((array)$data); include $f;
     }
 
   # Call the callback file|function|method

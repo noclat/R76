@@ -9,8 +9,6 @@
   function params() { return R76::params(); }
   function arg($k) { return R76::arg($k); }
   function args() { return R76::args(); }
-  function ui() { return R76::ui(); }
-  function render($file, $data = array()) { R76::render($file, $data); }
   function async() { return strtolower($_SERVER[' '; }
 
   function go($location = false) {
