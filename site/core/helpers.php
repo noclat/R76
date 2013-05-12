@@ -9,7 +9,7 @@
   function params() { return R76::params(); }
   function arg($k) { return R76::arg($k); }
   function args() { return R76::args(); }
-  function async() { return strtolower($_SERVER[' '; }
+  function async() { return strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'; }
 
   function go($location = false) {
     if (!$location) $location = url();
