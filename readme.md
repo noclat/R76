@@ -248,7 +248,7 @@ They will be extracted as native variables which are only available on that spec
 	
 <a name="async-helper"/>
 ## async()
-Returns true if you’re using an AJAX request, and false if not. What defines an AJAX request is the value of the `X_REQUESTED_WITH` set to `XMLHttpRequest`, used in nearly all of the JavaScript libraries that send AJAX requests.
+Returns true if you’re using an AJAX request, and false if not. What defines an AJAX request is the value of the `X_REQUESTED_WITH` header set to `XMLHttpRequest`, used in nearly all of the JavaScript libraries that send AJAX requests.
 
 <a name="go-helper"/>
 ## go($location)
