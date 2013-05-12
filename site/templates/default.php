@@ -1,5 +1,5 @@
 <?php if (path('section')) go(url('404')) ?>
-<?php render(ui.'snippets/header', array(
+<?php render('snippets/header', array(
   'title'       => 'Home',
   'description' => ''
   )) ?>
@@ -12,4 +12,4 @@
   
   
 
-<?php include ui.'snippets/footer.php' ?>
+<?php include ui.'snippets/footer.php'; // you can use normal includes, paths are relative to index.php ?>

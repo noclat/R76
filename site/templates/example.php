@@ -1,5 +1,5 @@
 <?php if (path('section')) go(url('404')) ?>
-<?php render(ui.'snippets/header', array(
+<?php render('snippets/header', array(
   'title'       => 'Sample page',
   'description' => ''
   )) ?>
