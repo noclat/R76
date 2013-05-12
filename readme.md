@@ -3,7 +3,7 @@ R76 is a light-weight PHP framework that can hold any kind of project. It only p
 
 R76 is shared under a [CC BY-SA license](http://creativecommons.org/licenses/by-sa/3.0). 
 
-See [Eye Fracture source](http://github.com/noclat/eyefracture) to get an advanced exemple of R76 usage.
+See [Eye Fracture source](http://github.com/noclat/eyefracture.com) to get an advanced exemple of R76 usage.
 
 # Documentation
 - [Load the system](#load-the-system)
