@@ -49,10 +49,12 @@
 
   # Call the callback file|function|method
     function run($default = false) {
-      if (!$this->callback) $this->callback = $default;
       if (is_string($this->callback)) $this->callback = array_map(array(__CLASS__, 'cleanPath'), explode(';', $this->callback));
-      $this->call($this->callback);
-      ob_end_flush();
+      if (!$this->call($this->callback) AND $default !== false) { 
+        $this->callback = $default; 
+        return $this->run(); 
+      }
+      return ob_end_flush();
     }
 
   # Set root complete path
@@ -100,22 +102,23 @@
       if (preg_match($pattern, $_SERVER['REQUEST_METHOD'].' '.$this->uri(), $m)) {
         $this->verb = $_SERVER['REQUEST_METHOD'];
         $this->path = array_combine(explode('/', str_replace('@', '', $route)), $this->path);
-        $this->callback = preg_replace_callback('/@([a-z0-9_]+)/i', function($m) { return $this->path($m[1]); }, $callback);
+        $tmp = $this; $this->callback = preg_replace_callback('/@([a-z0-9_]+)/i', function($m) use ($tmp) { return $tmp->path($m[1]); }, $callback);
         foreach (explode(';', $args) as $arg) { list ($k, $v) = explode(':', $arg); $this->args[$k] = $v; }
       }
     }
 
   # Call user file|function|method
     private function call($f, $args = false) {
-      if (is_array($f)) return array_map(__METHOD__, $f);
-      if (is_callable($f)) return call_user_func_array($f, (array)$args);
+      if (is_array($f)) return array_sum(array_map(__METHOD__, $f));
+      elseif (is_callable($f)) call_user_func_array($f, (array)$args);
       elseif (is_string($f)) {
-        if (is_file($f.'.php')) return include $f.'.php';
-        elseif (preg_match('/(.+)(->|::)(.+)/', $f, $parts)) {
-          if ($parts[2] == '->') $parts[1] = new $parts[1];
-          return call_user_func_array(array($parts[1], $parts[3]), (array)$args);
-        }
-      } throw new Exception('Call — Unknown callback: '.$f);
+        if (is_file($f.'.php')) include $f.'.php';
+        elseif (preg_match('/(.+)->(.+)/', $f, $m)) {
+          if (!class_exists($m[1]) OR !is_callable($f = array(new $m[1], $m[3]))) return false;
+          call_user_func_array($f, (array)$args);
+        } else return false;
+      } else throw new Exception('Call — Unknown callback: '.$f);
+      return true;
     }
 
   # Singleton pattern
