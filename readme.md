@@ -25,8 +25,6 @@ See [Eye Fracture source](http://github.com/noclat/eyefracture.com) to get an ad
   - [path() or R76::path()](#path-helper)
   - [param() or R76::param()](#param-helper)
   - [params() or R76::params()](#params-helper)
-  - [arg() or R76::arg()](#arg-helper)
-  - [args() or R76::args()](#args-helper)
   - [async()](#async-helper)
   - [go()](#go-helper)
 
@@ -70,7 +68,7 @@ Loads all the php files located in the given folder path. You can set multiple f
 ## ROUTE
 Route syntax is the most tricky, but still intuitive as hell.
 
-	ROUTE verbs url callbacks arguments
+	ROUTE verbs url callbacks
 
 You can allow any **verb** (GET, POST, PUT, DELETE) you want to access an url, and combine them by using the ‘|’ separator. The most common usage is: `GET|POST`.
 
@@ -85,13 +83,6 @@ The **callback** can be a file, a function or a method (see the [Callbacks secti
 	ROUTE GET       /@section/@feature      @section->@feature
 
 It’s 98% useless, but you can call multiple callbacks using the ‘;’ separator.
-
-**Arguments** are free to ommit or set whether you want to transmit some extra information or not. It could be used to differentiate two paths that call the same callback.
-
-	ROUTE GET       /articles/@id     site/templates/read   type:article
-	ROUTE GET       /notes/@id        site/templates/read   type:note
-
-There are other ways to do this without using arguments, for example, using the [path() helper](#path-helper), but it could be useful for the global legibility of your code. The syntax is `key:value`. Note that you can set multiple arguments using the ‘;’ separator. To get their value, see [arg() method](#arg-helper).
 
 ## DEFINE
 Sets a global constant. It’s practical, simply because you can gather all your configuration constants in the same configuration file, like paths, passwords (hashed), services & API codes (google analytics, typekit, etc.) and so on.
@@ -127,7 +118,7 @@ If any spreadsheet url changes, we only have to update the config file, without 
 ## Syntax sensibility
 Any path you’ll have to write (in url() function and the configuration file) are parsed to prevent from any bug occuring with the ‘slash’ character confusing use. So you can both write `/path/` or `path/`, and even `path`. Paths on DEFINE values and CUSTOM parameters aren’t parsed.
 
-In the configuration command lines, you can use as much inline spacing/tabs characters as you want between the values, and around ‘;’ separators. You are **not** allowed to put spaces when combining ROUTE verbs (GET, POST, PUT, DELETE).
+In the configuration command lines, you can use as much inline spacing/tabs characters as you want between the values, except around a ‘;’ or ‘|’ separators in ROUTE command.
 
 Commands are not case sensitive, but paths are.
 
@@ -207,17 +198,6 @@ Return the value of the GET parameter `$key`.
 <a name="params-helper"/>
 ## params() or R76::params()
 Return an associative array of the GET parameters, strickly he same as `$_GET` values.
-
-<a name="arg-helper"/>
-## arg($key) or R76::arg($key)
-Return the value of the argument `$key` set in the ROUTE command macthing the current URL.
-
-	// config: ROUTE GET /articles/@id site/templates/read type:article
-	echo arg(‘type’); // will return ‘article’
-	
-<a name="args-helper"/>
-## args() or R76::args()
-Return an associative array of the arguments set in the ROUTE command macthing the current URL.
   
 <a name="async-helper"/>
 ## async()

@@ -2,7 +2,7 @@
 # R76 by Nicolas Torres (76.io), CC BY-SA license: creativecommons.org/licenses/by-sa/3.0
   final class base {
     private static $instance;
-    private $root, $verb, $path = array(), $params = array(), $args = array(), $callback = false;
+    private $root, $verb, $path = array(), $params = array(), $callback = false;
 
   # Init
     function __construct() {
@@ -36,8 +36,6 @@
     function path($k) { return $this->path[$k]; }
     function param($k) { return $this->params[$k]; }
     function params() { return $this->params; }
-    function arg($k) { return $this->args[$k]; }
-    function args() { return $this->args; }
 
   # Get complete current|custom URL
     function url($path = false, $params = array()) {
@@ -67,7 +65,7 @@
     private function parseURI() {
       $uri = $this->cleanPath(substr('//'.$_SERVER['HTTP_HOST'].$_SERVER["REQUEST_URI"], strlen($this->root)));
       if ($params = basename(strstr($_SERVER["REQUEST_URI"], ':', true)).strstr($_SERVER["REQUEST_URI"], ':')) {
-        foreach (explode('/', $params) as $p) { list ($k, $v) = explode(':', trim(urldecode($p))); $this->params[$k] = $v; }
+        foreach (explode('/', $params) as $p) { list ($k, $v) = explode(':', $p); $this->params[$k] = trim(urldecode($v)); }
         $uri = strstr($uri, '/'.$params, true);
       }
       if ($ext = strrchr(basename($uri), '.')) $uri = substr($uri, 0, -strlen($ext));
@@ -96,14 +94,13 @@
   # PS: you can use '@var' in the name of your callback (e.g. GET /@section/@id @section->@id())
     private function route($cmd) {
       if ($this->callback) return;
-      list ($protocol, $route, $callback, $args) = preg_split('/\h+/', trim($cmd));
+      list ($protocol, $route, $callback) = preg_split('/\h+/', trim($cmd));
       $route = $this->cleanPath($route);
       $pattern = '/^(?:'.$protocol.') '.preg_replace('/@[a-z0-9_]+/i', '([a-z0-9_-]+)', preg_quote($route, '/')).'$/i';
       if (preg_match($pattern, $_SERVER['REQUEST_METHOD'].' '.$this->uri(), $m)) {
         $this->verb = $_SERVER['REQUEST_METHOD'];
         $this->path = array_combine(explode('/', str_replace('@', '', $route)), $this->path);
         $tmp = $this; $this->callback = preg_replace_callback('/@([a-z0-9_]+)/i', function($m) use ($tmp) { return $tmp->path($m[1]); }, $callback);
-        foreach (explode(';', $args) as $arg) { list ($k, $v) = explode(':', $arg); $this->args[$k] = $v; }
       }
     }
 
