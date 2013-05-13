@@ -196,7 +196,7 @@ Return the value of the GET parameter `$key`.
 Return an associative array of the GET parameters, strickly he same as `$_GET` values.
 
 <a name="verb-helper"/>
-## verb() or R76::verb()
+## verb()
 Returns the current verb (GET, POST, PUT, DELETE). Note: it returns the value of the `$_SERVER[‘REQUEST_METHOD’]` server variable.
   
 <a name="async-helper"/>
