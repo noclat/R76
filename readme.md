@@ -20,11 +20,11 @@ See [Eye Fracture source](http://github.com/noclat/eyefracture.com) to get an ad
 - [Helpers and R76 public methods](#helpers-and-r76-public-method)
   - [root() or R76::root()](#root-helper)
   - [url() or R76::url()](#url-helper)
-  - [verb() or R76::verb()](#verb-helper)
   - [uri() or R76::uri()](#uri-helper)
   - [path() or R76::path()](#path-helper)
   - [param() or R76::param()](#param-helper)
   - [params() or R76::params()](#params-helper)
+  - [verb()](#verb-helper)
   - [async()](#async-helper)
   - [go()](#go-helper)
 
@@ -167,10 +167,6 @@ Returns the absolute url, adding the parameters.
 
 will return `//yourdomain.com/article/read/4/showcomments:true/commentspage:1`.
 
-<a name="verb-helper"/>
-## verb() or R76::verb()
-Returns the current verb (GET, POST, PUT, DELETE).
-
 <a name="uri-helper"/>
 ## uri() or R76::uri()
 Returns the current URI, which is the URL freed from root and GET parameters.
@@ -198,6 +194,10 @@ Return the value of the GET parameter `$key`.
 <a name="params-helper"/>
 ## params() or R76::params()
 Return an associative array of the GET parameters, strickly he same as `$_GET` values.
+
+<a name="verb-helper"/>
+## verb() or R76::verb()
+Returns the current verb (GET, POST, PUT, DELETE). Note: it returns the value of the `$_SERVER[‘REQUEST_METHOD’]` server variable.
   
 <a name="async-helper"/>
 ## async()

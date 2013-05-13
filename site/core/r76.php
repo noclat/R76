@@ -2,7 +2,7 @@
 # R76 by Nicolas Torres (76.io), CC BY-SA license: creativecommons.org/licenses/by-sa/3.0
   final class base {
     private static $instance;
-    private $root, $verb, $path = array(), $params = array(), $callback = false;
+    private $root, $path = array(), $params = array(), $callback = false;
 
   # Init
     function __construct() {
@@ -31,7 +31,6 @@
 
   # Get URI components (and UI)
     function root() { return $this->root; }
-    function verb() { return $this->verb; }
     function uri() { return implode('/', $this->path); }
     function path($k) { return $this->path[$k]; }
     function param($k) { return $this->params[$k]; }
@@ -98,7 +97,6 @@
       $route = $this->cleanPath($route);
       $pattern = '/^(?:'.$protocol.') '.preg_replace('/@[a-z0-9_]+/i', '([a-z0-9_-]+)', preg_quote($route, '/')).'$/i';
       if (preg_match($pattern, $_SERVER['REQUEST_METHOD'].' '.$this->uri(), $m)) {
-        $this->verb = $_SERVER['REQUEST_METHOD'];
         $this->path = array_combine(explode('/', str_replace('@', '', $route)), $this->path);
         $tmp = $this; $this->callback = preg_replace_callback('/@([a-z0-9_]+)/i', function($m) use ($tmp) { return $tmp->path($m[1]); }, $callback);
       }
