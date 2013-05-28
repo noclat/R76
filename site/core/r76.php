@@ -39,17 +39,17 @@
   # Get complete current|custom URL
     function url($path = false, $params = array()) {
       if (is_array($path)) $params = array_replace($this->params, $path);
-      elseif (!$path) $params = $this->params;
-      $path = ($path AND !is_array($path)) ? $this->cleanPath($path) : $this->uri();
+      elseif ($path === false) $params = $this->params;
+      $path = ($path !== false AND !is_array($path)) ? $this->cleanPath($path) : $this->uri();
       return $this->root.$this->cleanPath(implode('/', array_merge((array)$path, array_map(function($k, $v) { return $k.':'.urlencode($v); }, array_keys($params), $params))));
     }
 
   # Call the callback file|function|method
     function run($default = false) {
       if (is_string($this->callback)) $this->callback = array_map(array(__CLASS__, 'cleanPath'), explode(';', $this->callback));
-      if (!$this->call($this->callback) AND $default !== false) { 
-        $this->callback = $default; 
-        return $this->run(); 
+      if (!$this->call($this->callback)) {
+        if ($default !== false) { $this->callback = $default; return $this->run(); }
+        else throw new Exception('Run — Unknown callback: '.$this->callback);
       }
       return ob_end_flush();
     }
@@ -74,7 +74,7 @@
   # Rewrite GET params (e.g. URI?search=terms&page=2 => URI/search:terms/page:2)
     private function rewriteGETparams() {
       if (count($_GET)) { 
-        header('location:/'.$this->cleanPath($this->url(strstr($this->uri(), '?', true)).'/'.implode('/', array_map(function($k, $v) { return $k.':'.stripslashes($v); }, array_keys($_GET), $_GET)))); 
+        header('location:/'.$this->cleanPath($this->url(''.strstr($this->uri(), '?', true))).'/'.implode('/', array_map(function($k, $v) { return $k.':'.stripslashes($v); }, array_keys($_GET), $_GET))); 
         exit; 
       }
     }
@@ -112,7 +112,7 @@
           if (!class_exists($m[1]) OR !is_callable($f = array(new $m[1], $m[3]))) return false;
           call_user_func_array($f, (array)$args);
         } else return false;
-      } else throw new Exception('Call — Unknown callback: '.$f);
+      } else return false;
       return true;
     }
 
