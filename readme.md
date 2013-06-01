@@ -57,8 +57,8 @@ The syntax is pretty simple: ‘command parameters’, one command per line, and
 		LOAD    site/core
 
 	# Routes
-		ROUTE   GET       /               site/templates/default
-		ROUTE   GET       /@section       site/templates/@section
+		ROUTE   GET       /               site/templates/default.php
+		ROUTE   GET       /@section       site/templates/@section.php
 
 ## LOAD
 Loads all the php files located in the given folder path. You can set multiple folders to load, simply use the ‘;’ separator. E.g.:
@@ -78,7 +78,7 @@ The **url** respect the [path syntax](#syntax-sensibility). Anyway, to match the
 
 The **callback** can be a file, a function or a method (see the [Callbacks section](#callbacks) for more information), and is able to use the variables in its name:
 
-	ROUTE GET       /@section               site/templates/@section  
+	ROUTE GET       /@section               site/templates/@section.php
 	ROUTE GET|POST  /articles/@action/@id   articles->@action  
 	ROUTE GET       /@section/@feature      @section->@feature
 
@@ -118,14 +118,14 @@ If any spreadsheet url changes, we only have to update the config file, without 
 ## Syntax sensibility
 Any path you’ll have to write (in url() function and the configuration file) are parsed to prevent from any bug occuring with the ‘slash’ character confusing use. So you can both write `/path/` or `path/`, and even `path`. Paths on DEFINE values and CUSTOM parameters aren’t parsed.
 
-In the configuration command lines, you can use as much inline spacing/tabs characters as you want between the values, except around a ‘;’ or ‘|’ separators in ROUTE command.
+In the configuration command lines, you can use as much inline spacing/tabs characters as you want between the values, except around a ‘;’ or ‘|’ separators in ROUTE commands.
 
 Commands are not case sensitive, but paths are.
 
-The URLs could be write both **with or without any extension**. `//example.com/sitemap` and `//example.com/sitemap.xml` are equaly regarded by the framework.
+The URLs could be written both **with or without any extension**. `//example.com/sitemap` and `//example.com/sitemap.xml` are equaly regarded by the framework.
 
 ## Callbacks
-Callbacks could be files, functions or methods. If it’s a file, it will just be included (and executed) — you don’t need to specify the `.php` extension —. If it’s a function or a method, just give the name, without the parenthesis. Examples: `load`, `article->read`, `articles::read`.
+Callbacks could be files, functions or methods. If it’s a file, it will just be included (and executed). If it’s a function or a method, just give the name, without the parenthesis. Examples: `load`, `article->read`, `articles::read`.
 
 ## GET parameters
 GET parameters aren’t part of the route. Any The callback of `/articles/archives` url and `/articles/archives/sort:year%20asc` will be the same. You can access those parameters in your code to make changes according to their values.

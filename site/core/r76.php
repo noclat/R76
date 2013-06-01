@@ -21,11 +21,11 @@
       $cmd = strstr($param, ' ', true);
       $param = trim(strstr($param, ' '));
       switch (strtolower($cmd)) {
-        case 'load': $this->load(array_map(array(__CLASS__, 'cleanPath'), explode(';', $param))); break;
+        case 'load': if (!$this->load(array_map(array(__CLASS__, 'cleanPath'), explode(';', $param)))) throw new Exception('Config LOAD - Unexisting folder(s): '.$param); break;
         case 'route': $this->route($param); break;
-        case 'define': define(strstr($param, ' ', true), trim(strstr($param, ' '))); break;
-        case 'custom': $this->call(strstr($param, ' ', true), preg_split('/\h+/', trim(strstr($param, ' ')))); break;
-        default: throw new Exception('Config — Unknown command: '.$cmd); break;
+        case 'define': if (!define(strstr($param, ' ', true), trim(strstr($param, ' ')))) throw new Exception('Config DEFINE - Wrong syntax: '.$param); break;
+        case 'custom': if (!$this->call(strstr($param, ' ', true), preg_split('/\h+/', trim(strstr($param, ' '))))) throw new Exception('Config CUSTOM - Wrong syntax: '.$param); break;
+        default: throw new Exception('Config - Unknown command: '.$cmd); break;
       }
     }
 
@@ -41,7 +41,7 @@
       if (is_array($path)) $params = array_replace($this->params, $path);
       elseif ($path === false) $params = $this->params;
       $path = ($path !== false AND !is_array($path)) ? $this->cleanPath($path) : $this->uri();
-      return $this->root.$this->cleanPath(implode('/', array_merge((array)$path, array_map(function($k, $v) { return $k.':'.urlencode($v); }, array_keys($params), $params))));
+      return $this->root.$this->cleanPath(implode('/', array_merge((array)$path, array_map(function($k, $v) { return $k.':'.urlencode($v); }, array_keys((array)$params), (array)$params))));
     }
 
   # Call the callback file|function|method
@@ -49,7 +49,7 @@
       if (is_string($this->callback)) $this->callback = array_map(array(__CLASS__, 'cleanPath'), explode(';', $this->callback));
       if (!$this->call($this->callback)) {
         if ($default !== false) { $this->callback = $default; return $this->run(); }
-        else throw new Exception('Run — Unknown callback: '.$this->callback);
+        else throw new Exception('Run - Unknown callback: '.$this->callback);
       }
       return ob_end_flush();
     }
@@ -85,12 +85,13 @@
   # Load given PHP files (e.g. path/dir1;path/dir2;...)
     private function load($path) {
       if (is_array($path)) return array_map(__METHOD__, $path);
-      if (!is_dir($path)) throw new Exception('Load — Unexisting folder: '.$path);
+      if (!is_dir($path)) return false;
       foreach (glob($path.'/*.php') as $file) include_once $file;
+      return true;
     }
 
   # Match route (e.g. GET|POST|PUT|DELETE /path/with/@var file|func()|class->method() argument1:value1;argument2:value2) 
-  # PS: you can use '@var' in the name of your callback (e.g. GET /@section/@id @section->@id())
+  # NB: ou can use '@var' in the name of your callback (e.g. GET /@section/@id @section->@id())
     private function route($cmd) {
       if ($this->callback) return;
       list ($protocol, $route, $callback) = preg_split('/\h+/', trim($cmd));
@@ -107,7 +108,7 @@
       if (is_array($f)) return array_sum(array_map(__METHOD__, $f));
       elseif (is_callable($f)) call_user_func_array($f, (array)$args);
       elseif (is_string($f)) {
-        if (is_file($f.'.php')) include $f.'.php';
+        if (is_file($f)) include $f;
         elseif (preg_match('/(.+)->(.+)/', $f, $m)) {
           if (!class_exists($m[1]) OR !is_callable($f = array(new $m[1], $m[3]))) return false;
           call_user_func_array($f, (array)$args);
