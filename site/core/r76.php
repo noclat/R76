@@ -80,7 +80,7 @@
     }
 
   # Remove slashes before and after
-    private function cleanPath($path) { return preg_replace(array('/^\/(.*)$/', '/^(.*)\/$/'), '$1', trim($path)); }
+    private function cleanPath($path) { return trim($path, "/ \t\n\r\0\x0B"); }
 
   # Load given PHP files (e.g. path/dir1;path/dir2;...)
     private function load($path) {
@@ -91,7 +91,7 @@
     }
 
   # Match route (e.g. GET|POST|PUT|DELETE /path/with/@var file|func()|class->method() argument1:value1;argument2:value2) 
-  # NB: ou can use '@var' in the name of your callback (e.g. GET /@section/@id @section->@id())
+  # PS: you can use '@var' in the name of your callback (e.g. GET /@section/@id @section->@id())
     private function route($cmd) {
       if ($this->callback) return;
       list ($protocol, $route, $callback) = preg_split('/\h+/', trim($cmd));
