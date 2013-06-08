@@ -6,21 +6,20 @@
 
   # Init
     function __construct() {
-      $this->setRoot();
+      $this->root = '//'.trim($_SERVER['HTTP_HOST'].dirname($_SERVER['PHP_SELF']), '/').'/';
       $this->parseURI();
       $this->rewriteGETparams();
       ob_start();
     }
 
   # Perform config (e.g. file|array|string)
-    function config($param) {
-      if (is_array($param)) return array_map(__METHOD__, $param);
-      elseif (is_file($param)) return call_user_func(__METHOD__, preg_split('/\v/m', file_get_contents($param)));
-      $param = trim($param);
-      if ($param{0} == '#' OR empty($param)) return;
-      $cmd = strstr($param, ' ', true);
-      $param = trim(strstr($param, ' '));
-      switch (strtolower($cmd)) {
+    function config($cmd) {
+      if (is_array($cmd)) return array_map(__METHOD__, $cmd);
+      elseif (is_file($cmd)) return call_user_func(__METHOD__, preg_split('/\v/m', file_get_contents($cmd)));
+      $cmd = trim($cmd);
+      if ($cmd{0} == '#' OR empty($cmd)) return;
+      $param = trim(strstr($cmd, ' '));
+      switch ($cmd = strtolower(strstr($cmd, ' ', true))) {
         case 'load': if (!$this->load(array_map('trim', explode(';', $param)))) throw new Exception('Config LOAD - Unexisting folder(s): '.$param); break;
         case 'route': $this->route($param); break;
         case 'define': if (!define(strstr($param, ' ', true), trim(strstr($param, ' ')))) throw new Exception('Config DEFINE - Wrong syntax: '.$param); break;
@@ -54,12 +53,6 @@
       return ob_end_flush();
     }
 
-  # Set root complete path
-    private function setRoot() {
-      $this->root = '//'.$_SERVER['HTTP_HOST'].dirname($_SERVER['PHP_SELF']);
-      if (substr($this->root, -1) != '/') $this->root .= '/';
-    }
-
   # Parse URI and params
     private function parseURI() {
       $uri = trim(substr('//'.$_SERVER['HTTP_HOST'].$_SERVER["REQUEST_URI"], strlen($this->root)), '/');
@@ -73,10 +66,9 @@
 
   # Rewrite GET params (e.g. URI?search=terms&page=2 => URI/search:terms/page:2)
     private function rewriteGETparams() {
-      if (count($_GET)) { 
-        header('location://'.trim($this->url(''.strstr($this->uri(), '?', true)), '/').'/'.implode('/', array_map(function($k, $v) { return $k.':'.stripslashes($v); }, array_keys($_GET), $_GET))); 
-        exit; 
-      }
+      if (!count($_GET)) return;
+      header('location://'.trim($this->url(''.strstr($this->uri(), '?', true)), '/').'/'.implode('/', array_map(function($k, $v) { return $k.':'.stripslashes($v); }, array_keys($_GET), $_GET))); 
+      exit;
     }
 
   # Load given PHP files (e.g. path/dir1;path/dir2;...)
@@ -116,9 +108,9 @@
 
   # Singleton pattern
     function __clone() {}
-    static function instance() {
-      if(!self::$instance) self::$instance = new self();  
-      return self::$instance;
+    static function instance() { 
+      if(!self::$instance) self::$instance = new self(); 
+      return self::$instance; 
     }
   }
 
