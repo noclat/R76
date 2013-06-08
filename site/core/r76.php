@@ -17,11 +17,11 @@
       if (is_array($param)) return array_map(__METHOD__, $param);
       elseif (is_file($param)) return call_user_func(__METHOD__, preg_split('/\v/m', file_get_contents($param)));
       $param = trim($param);
-      if (substr($param, 0, 1) == '#' OR empty($param)) return;
+      if ($param{0} == '#' OR empty($param)) return;
       $cmd = strstr($param, ' ', true);
       $param = trim(strstr($param, ' '));
       switch (strtolower($cmd)) {
-        case 'load': if (!$this->load(array_map(array(__CLASS__, 'cleanPath'), explode(';', $param)))) throw new Exception('Config LOAD - Unexisting folder(s): '.$param); break;
+        case 'load': if (!$this->load(array_map('trim', explode(';', $param)))) throw new Exception('Config LOAD - Unexisting folder(s): '.$param); break;
         case 'route': $this->route($param); break;
         case 'define': if (!define(strstr($param, ' ', true), trim(strstr($param, ' ')))) throw new Exception('Config DEFINE - Wrong syntax: '.$param); break;
         case 'custom': if (!$this->call(strstr($param, ' ', true), preg_split('/\h+/', trim(strstr($param, ' '))))) throw new Exception('Config CUSTOM - Wrong syntax: '.$param); break;
@@ -40,13 +40,13 @@
     function url($path = false, $params = array()) {
       if (is_array($path)) $params = array_replace($this->params, $path);
       elseif ($path === false) $params = $this->params;
-      $path = ($path !== false AND !is_array($path)) ? $this->cleanPath($path) : $this->uri();
-      return $this->root.$this->cleanPath(implode('/', array_merge((array)$path, array_map(function($k, $v) { return $k.':'.urlencode($v); }, array_keys((array)$params), (array)$params))));
+      $path = ($path !== false AND !is_array($path)) ? trim($path, "/ \t\n\r\0\x0B") : $this->uri();
+      return $this->root.implode('/', array_merge((array)$path, array_map(function($k, $v) { return $k.':'.urlencode($v); }, array_keys((array)$params), (array)$params)));
     }
 
   # Call the callback file|function|method
     function run($default = false) {
-      if (is_string($this->callback)) $this->callback = array_map(array(__CLASS__, 'cleanPath'), explode(';', $this->callback));
+      if (is_string($this->callback)) $this->callback = array_map('trim', explode(';', $this->callback));
       if (!$this->call($this->callback)) {
         if ($default !== false) { $this->callback = $default; return $this->run(); }
         else throw new Exception('Run - Unknown callback: '.$this->callback);
@@ -62,8 +62,8 @@
 
   # Parse URI and params
     private function parseURI() {
-      $uri = $this->cleanPath(substr('//'.$_SERVER['HTTP_HOST'].$_SERVER["REQUEST_URI"], strlen($this->root)));
-      if ($params = basename(strstr($_SERVER["REQUEST_URI"], ':', true)).strstr($_SERVER["REQUEST_URI"], ':')) {
+      $uri = trim(substr('//'.$_SERVER['HTTP_HOST'].$_SERVER["REQUEST_URI"], strlen($this->root)), '/');
+      if ($params = basename(strstr($uri, ':', true)).strstr($uri, ':')) {
         foreach (explode('/', $params) as $p) { list ($k, $v) = explode(':', $p); $this->params[$k] = trim(urldecode($v)); }
         $uri = strstr($uri, '/'.$params, true);
       }
@@ -74,19 +74,16 @@
   # Rewrite GET params (e.g. URI?search=terms&page=2 => URI/search:terms/page:2)
     private function rewriteGETparams() {
       if (count($_GET)) { 
-        header('location:/'.$this->cleanPath($this->url(''.strstr($this->uri(), '?', true))).'/'.implode('/', array_map(function($k, $v) { return $k.':'.stripslashes($v); }, array_keys($_GET), $_GET))); 
+        header('location://'.trim($this->url(''.strstr($this->uri(), '?', true)), '/').'/'.implode('/', array_map(function($k, $v) { return $k.':'.stripslashes($v); }, array_keys($_GET), $_GET))); 
         exit; 
       }
     }
-
-  # Remove slashes before and after
-    private function cleanPath($path) { return trim($path, "/ \t\n\r\0\x0B"); }
 
   # Load given PHP files (e.g. path/dir1;path/dir2;...)
     private function load($path) {
       if (is_array($path)) return array_map(__METHOD__, $path);
       if (!is_dir($path)) return false;
-      foreach (glob($path.'/*.php') as $file) include_once $file;
+      foreach (glob(trim($path, '/').'/*.php') as $file) include_once $file;
       return true;
     }
 
@@ -95,7 +92,7 @@
     private function route($cmd) {
       if ($this->callback) return;
       list ($protocol, $route, $callback) = preg_split('/\h+/', trim($cmd));
-      $route = $this->cleanPath($route);
+      $route = trim($route, '/');
       $pattern = '/^(?:'.$protocol.') '.preg_replace('/@[a-z0-9_]+/i', '([a-z0-9_-]+)', preg_quote($route, '/')).'$/i';
       if (preg_match($pattern, $_SERVER['REQUEST_METHOD'].' '.$this->uri(), $m)) {
         $this->path = array_combine(explode('/', str_replace('@', '', $route)), $this->path);
