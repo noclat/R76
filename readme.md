@@ -82,8 +82,6 @@ The **callback** can be a file, a function or a method (see the [Callbacks secti
 	ROUTE GET|POST  /articles/@action/@id   articles->@action  
 	ROUTE GET       /@section/@feature      @section->@feature
 
-It’s 98% useless, but you can call multiple callbacks using the ‘;’ separator.
-
 ## DEFINE
 Sets a global constant. It’s practical, simply because you can gather all your configuration constants in the same configuration file, like paths, passwords (hashed), services & API codes (google analytics, typekit, etc.) and so on.
 
@@ -118,11 +116,11 @@ If any spreadsheet url changes, we only have to update the config file, without 
 ## Syntax sensibility
 Any path you’ll have to write (in url() function and the configuration file) are parsed to prevent from any bug occuring with the ‘slash’ character confusing use. So you can both write `/path/` or `path/`, and even `path`. Paths on DEFINE values and CUSTOM parameters aren’t parsed.
 
-In the configuration command lines, you can use as much inline spacing/tabs characters as you want between the values, except around a ‘;’ or ‘|’ separators in ROUTE commands.
+In the configuration command lines, you can use as much inline spacing/tabs characters as you want between the values, except around a ‘|’ separators in ROUTE commands.
 
 Commands are not case sensitive, but paths are.
 
-The URLs could be written both **with or without any extension**. `//example.com/sitemap` and `//example.com/sitemap.xml` are equaly regarded by the framework.
+The URLs could be written both **with or without any extension**. `//example.com/sitemap` and `//example.com/sitemap.xml` are equaly regarded by the framework. Make sure the extension doesn't appear in the ROUTE command.
 
 ## Callbacks
 Callbacks could be files, functions or methods. If it’s a file, it will just be included (and executed). If it’s a function or a method, just give the name, without the parenthesis. Examples: `load`, `article->read`, `articles::read`.
@@ -186,7 +184,7 @@ If `$key` is numeric, it returns the nth part (zero-based) of the URI.
   
 <a name="param-helper"/>
 ## param($key) or R76::param($key)
-Return the value of the GET parameter `$key`.
+Return the value of the GET parameter `$key`. It's the same than $_GET[$key].
 
 	// current url: articles/tag:webdesign
 	echo param(‘tag’); // will return ‘webdesign’
