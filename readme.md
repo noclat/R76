@@ -30,14 +30,19 @@ See [Eye Fracture source](http://github.com/noclat/eyefracture.com) to get an ex
 
 
 # Start
-The source is an example of use. If you want to start from scratch, just remove anything but those files:
-	
-	.htaccess
-	site/core/r76.php
-	site/core/helpers.php
-			
-You can relocate the `r76.php` and `helpers.php` files. Start creating an `index.php` file at the top level. Don’t forget to update the protected directory path on the `.htaccess`.
+You can relocate the `r76.php` and `helpers.php` files. Start creating an `index.php` file at the top level. Don’t forget to update the protected directory path on the `.htaccess`. An example of file tree:
 
+	./
+		.htaccess
+		index.php
+		public/    (anything public like images, stylesheets and scripts)
+		site/    (protected directory)
+			core/     
+				r76.php
+				helpers.php
+				CONFIG
+				(and any other helpers)
+			templates/    (or any design pattern you want to use)
 
 # Load the system
 The index.php needs to load the system. Here is an example of what it should looks like:
