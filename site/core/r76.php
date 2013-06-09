@@ -4,11 +4,15 @@
     private static $instance;
     private $root, $path = array(), $params = array(), $callback = false;
 
-  # Init
+  # Parse URI and params & rewrite GET params (e.g. URI?search=terms&page=2 => URI/search:terms/page:2)
     function __construct() {
+      if (count($_GET)) { header('location://'.trim(strstr($_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'], '?', true), '/').'/'.strtr(http_build_query($_GET), '=&', ':/')); exit; }
       $this->root = '//'.trim($_SERVER['HTTP_HOST'].dirname($_SERVER['PHP_SELF']), '/').'/';
-      $this->parseURI();
-      $this->rewriteGETparams();
+      $uri = explode('/', trim(substr('//'.$_SERVER['HTTP_HOST'].$_SERVER["REQUEST_URI"], strlen($this->root)), '/'));
+      foreach ($uri as $p) if (strpos($p, ':') !== false) { list ($k, $v) = explode(':', $p); $this->params[$k] = trim(urldecode($v)); }
+      $uri = implode('/', array_reverse(array_slice(array_reverse($uri), count($this->params))));
+      $this->path = explode('/', rtrim(strrev(substr(strrev($uri), strpos(strrev($uri), '.'))), '.'));
+      $_GET = $this->params;
       ob_start();
     }
 
@@ -19,28 +23,27 @@
       $cmd = trim($cmd);
       if ($cmd{0} == '#' OR empty($cmd)) return;
       $param = trim(strstr($cmd, ' '));
-      switch ($cmd = strtolower(strstr($cmd, ' ', true))) {
-        case 'load': if (!$this->load(array_map('trim', explode(';', $param)))) throw new Exception('Config LOAD - Unexisting folder(s): '.$param); break;
+      switch (strtolower(strstr($cmd, ' ', true))) {
+        case 'load': if (!$this->load(array_map('trim', explode(';', $param)))) throw new Exception('Config - Unexisting folder(s): '.$cmd); break;
         case 'route': $this->route($param); break;
-        case 'define': if (!define(strstr($param, ' ', true), trim(strstr($param, ' ')))) throw new Exception('Config DEFINE - Wrong syntax: '.$param); break;
-        case 'custom': if (!$this->call(strstr($param, ' ', true), preg_split('/\h+/', trim(strstr($param, ' '))))) throw new Exception('Config CUSTOM - Wrong syntax: '.$param); break;
+        case 'define': if (!define(strstr($param, ' ', true), trim(strstr($param, ' ')))) throw new Exception('Config - Wrong syntax: '.$cmd); break;
+        case 'custom': if (!$this->call(strstr($param, ' ', true), preg_split('/\h+/', trim(strstr($param, ' '))))) throw new Exception('Configs - Wrong syntax: '.$cmd); break;
         default: throw new Exception('Config - Unknown command: '.$cmd); break;
       }
     }
 
-  # Get URI components (and UI)
+  # Get URL components
     function root() { return $this->root; }
     function uri() { return implode('/', $this->path); }
     function path($k) { return $this->path[$k]; }
     function param($k) { return $this->params[$k]; }
     function params() { return $this->params; }
 
-  # Get complete current|custom URL
-    function url($path = false, $params = array()) {
-      if (is_array($path)) $params = array_replace($this->params, $path);
-      elseif ($path === false) $params = $this->params;
-      $path = ($path !== false AND !is_array($path)) ? trim($path, "/ \t\n\r\0\x0B") : $this->uri();
-      return $this->root.implode('/', array_merge((array)$path, array_map(function($k, $v) { return $k.':'.urlencode($v); }, array_keys((array)$params), (array)$params)));
+  # Get absolute current|custom URL
+    function url($uri = false, $params = array()) {
+      if (is_array($uri)) $params = array_replace($this->params, $uri);
+      elseif ($uri === false) $params = $this->params;
+      return $this->root.(($uri !== false AND !is_array($uri))?trim($uri, "/ \t\n\r\0\x0B"):$this->uri()).(count($params)?'/'.strtr(http_build_query($params), '=&', ':/'):'');
     }
 
   # Call the callback file|function|method
@@ -51,24 +54,6 @@
         else throw new Exception('Run - Unknown callback: '.$this->callback);
       }
       return ob_end_flush();
-    }
-
-  # Parse URI and params
-    private function parseURI() {
-      $uri = trim(substr('//'.$_SERVER['HTTP_HOST'].$_SERVER["REQUEST_URI"], strlen($this->root)), '/');
-      if ($params = basename(strstr($uri, ':', true)).strstr($uri, ':')) {
-        foreach (explode('/', $params) as $p) { list ($k, $v) = explode(':', $p); $this->params[$k] = trim(urldecode($v)); }
-        $uri = strstr($uri, '/'.$params, true);
-      }
-      if ($ext = strrchr(basename($uri), '.')) $uri = substr($uri, 0, -strlen($ext));
-      $this->path = explode('/', $uri);
-    }
-
-  # Rewrite GET params (e.g. URI?search=terms&page=2 => URI/search:terms/page:2)
-    private function rewriteGETparams() {
-      if (!count($_GET)) return;
-      header('location://'.trim($this->url(''.strstr($this->uri(), '?', true)), '/').'/'.implode('/', array_map(function($k, $v) { return $k.':'.stripslashes($v); }, array_keys($_GET), $_GET))); 
-      exit;
     }
 
   # Load given PHP files (e.g. path/dir1;path/dir2;...)
@@ -85,10 +70,9 @@
       if ($this->callback) return;
       list ($protocol, $route, $callback) = preg_split('/\h+/', trim($cmd));
       $route = trim($route, '/');
-      $pattern = '/^(?:'.$protocol.') '.preg_replace('/@[a-z0-9_]+/i', '([a-z0-9_-]+)', preg_quote($route, '/')).'$/i';
-      if (preg_match($pattern, $_SERVER['REQUEST_METHOD'].' '.$this->uri(), $m)) {
+      if (preg_match('/^(?:'.$protocol.') '.preg_replace('/@[a-z0-9_]+/i', '([a-z0-9_-]+)', preg_quote($route, '/')).'$/i', $_SERVER['REQUEST_METHOD'].' '.$this->uri(), $m)) {
         $this->path = array_combine(explode('/', str_replace('@', '', $route)), $this->path);
-        $tmp = $this; $this->callback = preg_replace_callback('/@([a-z0-9_]+)/i', function($m) use ($tmp) { return $tmp->path($m[1]); }, $callback);
+        $tmp = $this; $this->callback = preg_replace_callback('/@([a-z0-9_]+)/i', function($m) use ($tmp) { return $tmp->path($m[1]); }, trim($callback, '/'));
       }
     }
 
