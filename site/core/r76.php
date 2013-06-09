@@ -11,7 +11,7 @@
       foreach ($uri as $p) if (strpos($p, ':') !== false) { list ($k, $v) = explode(':', $p); $_GET[$k] = trim(urldecode($v)); }
       $uri = implode('/', array_reverse(array_slice(array_reverse($uri), count($_GET))));
       $this->path = explode('/', rtrim(substr($uri, 0, strlen($uri)-strpos(strrev($uri), '.')), '.'));
-      ob_start();
+      return ob_start();
     }
 
   # Perform config (e.g. file|array|string)
@@ -34,8 +34,6 @@
     function root() { return $this->root; }
     function uri() { return implode('/', $this->path); }
     function path($k) { return $this->path[$k]; }
-    function param($k) { return $_GET[$k]; }
-    function params() { return $_GET; }
 
   # Get absolute current|custom URL
     function url($uri = false, $params = array()) {
@@ -80,24 +78,11 @@
 
   # Singleton pattern
     function __clone() {}
-    static function instance() { 
-      if(!self::$instance) self::$instance = new self(); 
-      return self::$instance; 
-    }
+    static function instance() { if(!self::$instance) self::$instance = new self(); return self::$instance; }
   }
+  
+  
 
-
-
-# Static-fy R76 methods
-  class R76 {
-    private static $_;
-    static function __callstatic($func, array $args) { 
-      if (!self::$_) self::$_ = base::instance();
-      return call_user_func_array(array(self::$_, $func), $args); 
-    }
-  }
-
-
-
-# Load site
+# Static R76 methods & return instance
+  class R76 { static function __callstatic($func, array $args) { return call_user_func_array(array(base::instance(), $func), $args); } }
   return base::instance();
