@@ -1,7 +1,10 @@
 <?php
 # R76 by Nicolas Torres (76.io), CC BY-SA license: creativecommons.org/licenses/by-sa/3.0
+  class R76 { static function __callstatic($f, array $args) { return call_user_func_array(array(base::instance(), $f), $args); } }
   final class base {
     private static $instance; private $root, $path = array(), $callback = false;
+    static function instance() { if(!self::$instance) self::$instance = new self(); return self::$instance; }
+    function __clone() {}
 
   # Parse URI and params & rewrite GET params (e.g. URI?search=terms&page=2 => URI/search:terms/page:2)
     function __construct() {
@@ -15,14 +18,14 @@
 
   # Perform config (e.g. file|array|string)
     function config($cmd) {
-      if (is_file($cmd)) return array_map(__METHOD__, preg_split('/\v/m', file_get_contents($cmd)));
-      elseif (is_array($cmd)) return array_map(__METHOD__, $cmd);
+      if (is_file($cmd)) $cmd = preg_split('/\v/m', file_get_contents($cmd));
+      if (is_array($cmd)) return array_map(__METHOD__, $cmd);
       $cmd = trim($cmd);
       if ($cmd{0} == '#' OR empty($cmd)) return;
       $param = trim(strstr($cmd, ' '));
       switch (strtolower(strstr($cmd, ' ', true))) {
         case 'load': if (!$this->load(array_map('trim', explode(';', $param)))) throw new Exception('Config - Unexisting folder(s): '.$cmd); break;
-        case 'route': $this->route($param); break;
+        case 'route': if (!$this->callback) $this->route($param); break;
         case 'define': if (!define(strstr($param, ' ', true), trim(strstr($param, ' ')))) throw new Exception('Config - Wrong syntax: '.$cmd); break;
         case 'custom': if (!$this->call(strstr($param, ' ', true), preg_split('/\h+/', trim(strstr($param, ' '))))) throw new Exception('Configs - Wrong syntax or callback: '.$cmd); break;
         default: throw new Exception('Config - Unknown command: '.$cmd); break;
@@ -33,8 +36,6 @@
     function root() { return $this->root; }
     function uri() { return implode('/', $this->path); }
     function path($k) { return $this->path[$k]; }
-
-  # Get absolute current|custom URL
     function url($uri = false, $params = array()) {
       if (is_array($uri)) $params = array_replace($_GET, $uri);
       elseif ($uri === false) $params = $_GET;
@@ -54,34 +55,22 @@
       return is_dir($path);
     }
 
-  # Match route (e.g. GET|POST|PUT|DELETE /path/with/@var file|func()|class->method()) 
-  # Note: you can use '@var' in the name of your callback (e.g. GET /@section/@id @section->@id())
+  # Match route (e.g. GET|POST|PUT|DELETE /path/with/@var path/to/file.ext|func()|class->method()). Note: you can use '@var' in callbacks
     private function route($cmd) {
-      if ($this->callback) return;
       list ($protocol, $route, $callback) = preg_split('/\h+/', trim($cmd));
       $route = trim($route, '/');
       if (preg_match('/^(?:'.$protocol.') '.preg_replace('/@[a-z0-9_]+/i', '([a-z0-9_-]+)', preg_quote($route, '/')).'$/i', $_SERVER['REQUEST_METHOD'].' '.$this->uri(), $m)) {
-        $this->path = array_combine(explode('/', str_replace('@', '', $route)), $this->path);
-        $tmp = $this; $this->callback = preg_replace_callback('/@([a-z0-9_]+)/i', function($m) use ($tmp) { return $tmp->path($m[1]); }, trim($callback, '/'));
+        $tmp = $this->path = array_combine(explode('/', str_replace('@', '', $route)), $this->path);
+        $this->callback = preg_replace_callback('/@([a-z0-9_]+)/i', function($m) use ($tmp) { return $tmp[$m[1]]; }, trim($callback, '/'));
       }
     }
 
   # Call user file|function|method
     private function call($f, $args = false) {
-      if (is_callable($f)) { call_user_func_array($f, (array)$args); return true; }
-      elseif (is_string($f)) {
-        if (is_file($f)) return @include $f;
-        elseif (preg_match('/(.+)->(.+)/', $f, $m) AND is_callable($f = array(new $m[1], $m[3]))) { call_user_func_array($f, (array)$args); return true; }
-      } return false;
+      if (is_callable($f)) call_user_func_array($f, (array)$args);
+      elseif (is_file((string)$f)) include $f;
+      elseif (preg_match('/(.+)->(.+)/', (string)$f, $m) AND is_callable($f = array(new $m[1], $m[3]))) call_user_func_array($f, (array)$args);
+      else return false; return true;
     }
-
-  # Singleton pattern
-    function __clone() {}
-    static function instance() { if(!self::$instance) self::$instance = new self(); return self::$instance; }
-  }
-
-
-
-# Static R76 methods & return instance
-  class R76 { static function __callstatic($f, array $args) { return call_user_func_array(array(base::instance(), $f), $args); } }
+  } 
   return base::instance();
