@@ -9,8 +9,7 @@
       $this->root = '//'.trim($_SERVER['HTTP_HOST'].dirname($_SERVER['PHP_SELF']), '/').'/';
       $uri = explode('/', trim(substr('//'.$_SERVER['HTTP_HOST'].$_SERVER["REQUEST_URI"], strlen($this->root)), '/'));
       foreach ($uri as $p) if (strpos($p, ':') !== false) { list ($k, $v) = explode(':', $p); $_GET[$k] = trim(urldecode($v)); }
-      $uri = implode('/', array_reverse(array_slice(array_reverse($uri), count($_GET))));
-      $this->path = explode('/', rtrim(substr($uri, 0, strlen($uri)-strpos(strrev($uri), '.')), '.'));
+      $this->path = explode('/', preg_replace('/\.[a-z]+$/i', '', implode('/', array_reverse(array_slice(array_reverse($uri), count($_GET))))));
       return ob_start();
     }
 
@@ -80,8 +79,8 @@
     function __clone() {}
     static function instance() { if(!self::$instance) self::$instance = new self(); return self::$instance; }
   }
-  
-  
+
+
 
 # Static R76 methods & return instance
   class R76 { static function __callstatic($f, array $args) { return call_user_func_array(array(base::instance(), $f), $args); } }
