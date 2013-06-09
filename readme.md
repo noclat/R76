@@ -58,7 +58,7 @@ The `run()` method displays the result, and gets a callback in parameter, called
 # Configuration file
 The syntax is pretty simple: ‘command parameters’, one command per line, and you can comment a line by starting it with a ‘#’. Commands available: **LOAD**, **ROUTE**, **DEFINE**, **CUSTOM**. This is a sample config file:
 
-  # System
+ 	# System
 		LOAD    site/core
 
 	# Routes
