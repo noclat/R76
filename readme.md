@@ -3,7 +3,7 @@ R76 is a light-weight PHP framework that can hold any kind of project. It only p
 
 R76 is shared under a [CC BY-SA license](http://creativecommons.org/licenses/by-sa/3.0). 
 
-See [Eye Fracture source](http://github.com/noclat/eyefracture.com) to get an advanced exemple of R76 usage.
+See [Eye Fracture source](http://github.com/noclat/eyefracture.com) to get an exemple of R76 usage.
 
 # Documentation
 - [Start](#start)
@@ -45,7 +45,7 @@ The index.php needs to load the system. Here is an example of what it should loo
 	<?php
 	$site = include 'site/core/r76.php';
 	$site->config('site/core/CONFIG');
-	$site->run(function() { go(url('404')); });
+	$site->run(function() { include 'site/templates/404.php'; });
 
 The `config()` method could be called using both an array of commands or a file (one command per line).  
 The `run()` method displays the result, and gets a callback in parameter, called when the URL doesn’t match any route configuration. See the [Callbacks section](#callbacks) below to know more about what is posssible to do with.
