@@ -84,5 +84,5 @@
   
 
 # Static R76 methods & return instance
-  class R76 { static function __callstatic($func, array $args) { return call_user_func_array(array(base::instance(), $func), $args); } }
+  class R76 { static function __callstatic($f, array $args) { return call_user_func_array(array(base::instance(), $f), $args); } }
   return base::instance();
