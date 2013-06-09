@@ -1,7 +1,7 @@
 <?php
 # R76 by Nicolas Torres (76.io), CC BY-SA license: creativecommons.org/licenses/by-sa/3.0
-  class R76 { static function __callstatic($f, array $args) { return call_user_func_array(array(base::instance(), $f), $args); } }
-  final class base {
+  class R76 { static function __callstatic($f, array $args) { return call_user_func_array(array(R76_base::instance(), $f), $args); } }
+  final class R76_base {
     private static $instance; private $root, $path = array(), $callback = false;
     static function instance() { if(!self::$instance) self::$instance = new self(); return self::$instance; }
     function __clone() {}
@@ -73,4 +73,4 @@
       else return false; return true;
     }
   } 
-  return base::instance();
+  return R76_base::instance();
