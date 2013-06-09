@@ -17,7 +17,7 @@ See [Eye Fracture source](http://github.com/noclat/eyefracture.com) to get an ex
   - [Syntax sensibility](#syntax-sensibility)
   - [Callbacks](#callbacks)
   - [GET parameters](#get-parameters)
-- [Helpers and R76 public methods](#helpers-and-r76-public-method)
+- [Helpers and R76 public methods](#helpers-and-r76-public-methods)
   - [root() or R76::root()](#root-helper)
   - [url() or R76::url()](#url-helper)
   - [uri() or R76::uri()](#uri-helper)
