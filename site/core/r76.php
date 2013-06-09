@@ -46,7 +46,7 @@
 
   # Call the callback file|function|method
     function run($default = false) {
-      if (!$this->call($this->callback) AND !$this->call($default)) throw new Exception('Run - Unknown callback: '.$this->callback);
+      if (!$this->call($this->callback) AND !$this->call($default)) throw new Exception('Run - Unknown callback: '.$this->callback.' or default: '.$default);
       return ob_end_flush();
     }
 
