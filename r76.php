@@ -12,7 +12,7 @@
       $this->root = '//'.trim($_SERVER['HTTP_HOST'].dirname($_SERVER['PHP_SELF']), '/').'/';
       $uri = explode('/', trim(substr('//'.$_SERVER['HTTP_HOST'].$_SERVER["REQUEST_URI"], strlen($this->root)), '/'));
       foreach ($uri as $p) if (strpos($p, ':') !== false) { list ($k, $v) = explode(':', $p); $_GET[$k] = trim(urldecode($v)); }
-      $this->path = explode('/', preg_replace('/\.[a-z]+$/i', '', implode('/', array_reverse(array_slice(array_reverse($uri), count($_GET))))));
+      $this->path = explode('/', preg_replace('/\.[a-z]+$/i', '', implode('/', array_slice($uri, 0, count($uri)-count($_GET)))));
       return ob_start();
     }
 
@@ -27,7 +27,7 @@
         case 'load': if (!$this->load(array_map('trim', explode(';', $param)))) throw new Exception('Config - Unexisting folder(s): '.$cmd); break;
         case 'route': if (!$this->callback) $this->route($param); break;
         case 'define': if (!define(strstr($param, ' ', true), trim(strstr($param, ' ')))) throw new Exception('Config - Wrong syntax: '.$cmd); break;
-        case 'custom': if (!$this->call(strstr($param, ' ', true), preg_split('/\h+/', trim(strstr($param, ' '))))) throw new Exception('Configs - Wrong syntax or callback: '.$cmd); break;
+        case 'custom': $param = preg_split('/\h+/', trim($param)); if (!$this->call(array_shift($param), $param)) throw new Exception('Configs - Wrong syntax or callback: '.$cmd); break;
         default: throw new Exception('Config - Unknown command: '.$cmd); break;
       }
     }
@@ -69,7 +69,7 @@
     private function call($f, $args = false) {
       if (is_callable($f)) call_user_func_array($f, (array)$args);
       elseif (is_file((string)$f)) include $f;
-      elseif (preg_match('/(.+)->(.+)/', (string)$f, $m) AND is_callable($f = array(new $m[1], $m[3]))) call_user_func_array($f, (array)$args);
+      elseif (preg_match('/(.+)->(.+)/', (string)$f, $m) AND is_callable($f = array(new $m[1], $m[2]))) call_user_func_array($f, (array)$args);
       else return false; return true;
     }
   } 
