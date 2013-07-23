@@ -89,7 +89,7 @@ Route syntax is the most tricky, but still intuitive as hell.
 
 You can allow any **verb** (GET, POST, PUT, DELETE) you want to access an url, and combine them by using the ‘|’ separator. The most common usage is: `GET|POST`.
 
-The **url** respect the [path syntax](#syntax-sensibility). Anyway, to match the root, you’ll need to set the url as ‘/’. Note that [GET parameters](#get-parameters) aren’t part of the route. You can use variables in it for dynamic urls, just put an ‘@‘ before the name of the variable you want. To get their value, see [path() method](#path-helper). E.g.: 
+The **url** respects the [path syntax](#syntax-sensibility). Anyway, to match the root, you’ll need to set the url as ‘/’. Note that [GET parameters](#get-parameters) aren’t part of the route. You can use variables in it for dynamic urls, just put an ‘@‘ before the name of the variable you want. To get their value, see [path() method](#path-helper). E.g.: 
 
 	ROUTE GET /articles/@id/comments/page/@page callback
 
@@ -140,7 +140,7 @@ Commands are not case sensitive, but paths are.
 The URLs could be written both **with or without any extension**. `//example.com/sitemap` and `//example.com/sitemap.xml` are equaly regarded by the framework. Make sure the extension doesn't appear in the ROUTE command.
 
 ## Callbacks
-Callbacks could be files, functions or methods. If it’s a file, it will just be included (and executed). If it’s a function or a method, just give the name, without the parenthesis. Examples: `load`, `article->read`, `articles::read`.
+Callbacks could be files, functions or methods. If it’s a file, it will just be included (and executed). If it’s a function or a method, just give the name, without the parenthesis. Examples: `load`, `articles::read`, `article->read` — in this last case, the ‘article’ class will be instanciated and the `__construct()` method will be triggered.
 
 ## GET parameters
 GET parameters aren’t part of the route. Any The callback of `/articles/archives` url and `/articles/archives/sort:year%20asc` will be the same. You can access those parameters in your code to make changes according to their values.
