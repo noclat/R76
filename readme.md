@@ -17,6 +17,7 @@ See [Eye Fracture source](http://github.com/noclat/eyefracture.com) to get an ex
   - [Syntax sensibility](#syntax-sensibility)
   - [Callbacks](#callbacks)
   - [GET parameters](#get-parameters)
+  - [Before and after route callbacks](#before-and-after-route-callbacks)
 - [Helpers and R76 public methods](#helpers-and-r76-public-methods)
   - [root() or R76::root()](#root-helper)
   - [url() or R76::url()](#url-helper)
@@ -108,7 +109,7 @@ You can do what you want with the CUSTOM command. This is the syntax:
 
 	CUSTOM callback parameters
 
-It’s just calling a callback (function or method) with the given the parameters. The parameters syntax is simple, just use any spacing character between them: `parameter1 parameter2 parameter3…`. It could help if you need to parse some configuration values, for example an external URL (from any API or service like Google Documents), or set a bunch of related ‘constants’.
+It’s just calling a callback (function or method) with the given the parameters (optional). The parameters syntax is simple, just use any spacing character between them: `parameter1 parameter2 parameter3…`. It could help if you need to parse some configuration values, for example an external URL (from any API or service like Google Documents), or set a bunch of related ‘constants’.
 
 Here’s a real life example, used for [Eye Fracture](http://eyefracture.com), which database is stored in 4 Google Spreadsheets:
 
@@ -146,6 +147,18 @@ GET parameters aren’t part of the route. Any The callback of `/articles/archiv
 
 Note: GET parameters will be rewrited from `?key=value&key2=value2` to `/key:value/key2:value2`, but still available using $_GET superglobal.
 
+##  Before and after route callbacks
+You can simply call before and after route callbacks by using this trick:
+
+	# Before route
+	CUSTOM beforeRouteCallback
+	
+	# Routes
+	ROUTE   GET       /               site/templates/default.php
+	ROUTE   GET       /@section       site/templates/@section.php
+	
+	# After route
+	CUSTOM afterRouteCallback
 
 # Helpers and R76 public methods
 Some values and functions are avaiable to manipulate anything related to URLs and template files. Those functions are avaible in all your files.
