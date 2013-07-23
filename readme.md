@@ -64,6 +64,17 @@ The syntax is pretty simple: ‘command parameters’, one command per line, and
 	# Routes
 		ROUTE   GET       /               site/templates/default.php
 		ROUTE   GET       /@section       site/templates/@section.php
+		
+It's also possible to call these commands using the `R76::config()` method. Example with the previous index.php file:
+
+	<?php
+	$site = include 'site/core/r76.php';
+	$site->config('LOAD site/core'); // inline command
+	$site->config(array(
+		'ROUTE GET / site/templates/default.php',
+		'ROUTE GET /@section site/templates/@section.php'
+	)); // array of commands
+	$site->run(function() { include 'site/templates/404.php'; });
 
 ## LOAD
 Loads all the php files located in the given folder path. You can set multiple folders to load, simply use the ‘;’ separator. E.g.:
@@ -196,7 +207,7 @@ Return the value of the GET parameter `$key`. It's the same than $_GET[$key].
 	
 <a name="params-helper"/>
 ## params() or R76::params()
-Return an associative array of the GET parameters, strickly he same as `$_GET` values.
+Return an associative array of the GET parameters, strickly the same as `$_GET` values.
 
 <a name="verb-helper"/>
 ## verb()
