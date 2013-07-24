@@ -81,9 +81,9 @@ It's also possible to call these commands using the `R76::config()` method. Exam
 	$site->run(function() { include 'site/templates/404.php'; });
 
 ## LOAD
-Loads all the php files located in the given folder path. You can set multiple folders to load, simply use the ‘;’ separator. E.g.:
+Loads all the php files located in the given folder path. You can set multiple folders to load, simply separate them with any spacing character. E.g.:
 
-	LOAD site/core;site/helpers;site/custom
+	LOAD site/core site/helpers site/custom
 
 ## ROUTE
 Route syntax is the most tricky, but still intuitive as hell.
@@ -153,15 +153,27 @@ Note: GET parameters will be automatically rewrited from `?key=value&key2=value2
 ##  Before and after route callbacks
 You can simply call before and after route callbacks by using this trick:
 
-	# Before route
 	CUSTOM beforeRouteCallback
-	
-	# Routes
+	# Anything above will be executed before the route callback
 	ROUTE   GET       /               site/templates/default.php
 	ROUTE   GET       /@section       site/templates/@section.php
-	
-	# After route
+	# 	Anything below will be executed after the route callback
 	CUSTOM afterRouteCallback
+	
+Or, if you set the config directly on a PHP file:
+
+	<?php
+	$site = include 'site/core/r76.php';
+	$site->config('LOAD site/core');
+	beforeRoute(); 
+	// anything above will be executed before the route callback
+	$site->config(array(
+		'ROUTE GET / site/templates/default.php',
+		'ROUTE GET /@section site/templates/@section.php'
+	)); 
+	// anything below will be executed after the route callback
+	afterRoute();
+	$site->run(function() { include 'site/templates/404.php'; });
 
 # Helpers and R76 public methods
 Some values and functions are avaiable to manipulate anything related to URLs and template files. Those functions are avaible in all your files.

@@ -24,7 +24,7 @@
       if ($cmd{0} == '#' OR empty($cmd)) return;
       $param = preg_split('/\h+/', $cmd);
       switch (strtolower(array_shift($param))) {
-        case 'load': if (!$this->load(array_map('trim', explode(';', $param[0])))) throw new Exception('Config - Unexisting folder(s): '.$cmd); break;
+        case 'load': if (!$this->load($param)) throw new Exception('Config - Unexisting folder(s): '.$cmd); break;
         case 'route': if (!$this->callback) $this->route(implode(' ', $param), $callback); break;
         case 'define': if (!define($param[0], $param[1])) throw new Exception('Config - Wrong syntax: '.$cmd); break;
         case 'custom': if (!$this->call(array_shift($param), $param)) throw new Exception('Config - Wrong syntax or callback: '.$cmd); break;
