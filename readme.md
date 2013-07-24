@@ -56,7 +56,7 @@ The index.php needs to load the system. Here is an example of what it should loo
 The `config()` method could be called using both an array of commands or a file (one command per line).  
 The `run()` method displays the result, and gets a callback in parameter, called when the URL doesn’t match any route configuration. See the [Callbacks section](#callbacks) below to know more about what is posssible to do with.
 
-# Configuration file
+# Configuration
 The syntax is pretty simple: ‘command parameters’, one command per line, and you can comment a line by starting it with a ‘#’. Commands available: **LOAD**, **ROUTE**, **DEFINE**, **CUSTOM**. This is a sample config file:
 
  	# System
@@ -75,6 +75,9 @@ It's also possible to call these commands using the `R76::config()` method. Exam
 		'ROUTE GET / site/templates/default.php',
 		'ROUTE GET /@section site/templates/@section.php'
 	)); // array of commands
+	$site->config('ROUTE GET /@section/@id', function() {
+		// callback as a second parameter, could be a string too
+	}); 
 	$site->run(function() { include 'site/templates/404.php'; });
 
 ## LOAD
@@ -143,9 +146,9 @@ The URLs could be written both **with or without any extension**. `//example.com
 Callbacks could be files, functions or methods. If it’s a file, it will just be included (and executed). If it’s a function or a method, just give the name, without the parenthesis. Examples: `load`, `articles::read`, `article->read` — in this last case, the ‘article’ class will be instanciated and the `__construct()` method will be triggered.
 
 ## GET parameters
-GET parameters aren’t part of the route. Any The callback of `/articles/archives` url and `/articles/archives/sort:year%20asc` will be the same. You can access those parameters in your code to make changes according to their values.
+GET parameters aren’t part of the route. Any callback of `/articles/archives` url and `/articles/archives/sort:year%20asc` will be the same. You can access those parameters in your code to make changes according to their values.
 
-Note: GET parameters will be rewrited from `?key=value&key2=value2` to `/key:value/key2:value2`, but still available using $_GET superglobal.
+Note: GET parameters will be automatically rewrited from `?key=value&key2=value2` to `/key:value/key2:value2`, but still available using $_GET superglobal.
 
 ##  Before and after route callbacks
 You can simply call before and after route callbacks by using this trick:
