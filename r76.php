@@ -25,7 +25,7 @@
       $param = preg_split('/\h+/', $cmd);
       switch (strtolower(array_shift($param))) {
         case 'load': if (!$this->load($param)) throw new Exception('Config - Unexisting folder(s): '.$cmd); break;
-        case 'route': if (!$this->callback) $this->route(implode(' ', $param), $callback); break;
+        case 'route': if (!$this->callback) $this->route(array_merge($param, (array)$callback)); break;
         case 'define': if (!define($param[0], $param[1])) throw new Exception('Config - Wrong syntax: '.$cmd); break;
         case 'custom': if (!$this->call(array_shift($param), $param)) throw new Exception('Config - Wrong syntax or callback: '.$cmd); break;
         default: throw new Exception('Config - Unknown command: '.$cmd); break;
@@ -56,12 +56,12 @@
     }
 
   # Match route (e.g. GET|POST|PUT|DELETE /path/with/@var path/to/file.ext|func()|class->method()). Note: you can use '@var' in callbacks
-    private function route($cmd, $callback = false) {
-      list ($protocol, $route, $tmpcallback) = explode(' ', trim($cmd));
+    private function route($params) {
+      list ($verb, $route, $callback) = $params;
       $route = trim($route, '/');
-      if (preg_match('/^(?:'.$protocol.') '.preg_replace('/@[a-z0-9_]+/i', '([a-z0-9_-]+)', preg_quote($route, '/')).'$/i', $_SERVER['REQUEST_METHOD'].' '.$this->uri(), $m)) {
+      if (preg_match('/^(?:'.$verb.') '.preg_replace('/@[a-z0-9_]+/i', '([a-z0-9_-]+)', preg_quote($route, '/')).'$/i', $_SERVER['REQUEST_METHOD'].' '.$this->uri(), $m)) {
         $tmp = $this->path = array_combine(explode('/', str_replace('@', '', $route)), $this->path);
-        $this->callback = $callback ? $callback : preg_replace_callback('/@([a-z0-9_]+)/i', function($m) use ($tmp) { return $tmp[$m[1]]; }, trim($tmpcallback, '/'));
+        $this->callback = !is_string($callback) ? $callback : preg_replace_callback('/@([a-z0-9_]+)/i', function($m) use ($tmp) { return $tmp[$m[1]]; }, trim($callback, '/'));
       }
     }
 
