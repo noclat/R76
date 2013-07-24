@@ -136,7 +136,7 @@ If any spreadsheet url changes, we only have to update the config file, without 
 ## Syntax sensibility
 Any path you’ll have to write (in url() function and the configuration file) are parsed to prevent from any bug occuring with the ‘slash’ character confusing use. So you can both write `/path/` or `path/`, and even `path`. Paths on DEFINE values and CUSTOM parameters aren’t parsed.
 
-In the configuration command lines, you can use as much inline spacing/tabs characters as you want between the values, except around a ‘|’ separator in ROUTE commands.
+In the configuration command lines, you can use as much inline spacing/tabs characters as you want between the values, except around a ‘|’ separators in ROUTE commands.
 
 Commands are not case sensitive, but paths are.
 
