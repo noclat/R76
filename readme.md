@@ -1,33 +1,34 @@
 # R76 router
-R76 is a light-weight PHP framework that can hold any kind of project. It only provides [a router](site/core/) and an extended config file to help the files tree and code organization. You still the real master of your project, since R76 is optimized for both procedural or POO environments, and does not require any specific intern organization or design pattern.
+R76 is a light-weight PHP framework that can hold any kind of project. It only provides a **RESTful router** and some extended configuration features to help the code organization. You are still the real master of your project, since R76 is optimized for both procedural or POO environments, and does not require any specific intern organization or design pattern.
 
 R76 is shared under a [CC BY-SA license](http://creativecommons.org/licenses/by-sa/3.0). 
 
-See [Eye Fracture source](http://github.com/noclat/eyefracture.com) to get an exemple of R76 usage.
+See [Eye Fracture source](http://github.com/noclat/eyefracture.com) to get a full exemple of R76 usage.
 
 # Documentation
 - [Start](#start)
 - [Load the system](#load-the-system)
 - [Configuration](#configuration)
-  - [LOAD](#load)
-  - [ROUTE](#route)
-  - [DEFINE](#define)
-  - [CUSTOM](#custom)
+	- [load](#load)
+	- [route, get, post, put, delete](#route-get-post-put-delete)
+	- [Config file](#config-file)
+		- [define](#define)
+		- [custom](#custom)
 - [Tips](#tips)
-  - [Syntax sensibility](#syntax-sensibility)
-  - [Callbacks](#callbacks)
-  - [GET parameters](#get-parameters)
-  - [Before and after route callbacks](#before-and-after-route-callbacks)
+	- [Syntax sensibility](#syntax-sensibility)
+	- [Callbacks](#callbacks)
+	- [GET parameters](#get-parameters)
+	- [Before and after route callbacks](#before-and-after-route-callbacks)
 - [Helpers and R76 public methods](#helpers-and-r76-public-methods)
-  - [root() or R76::root()](#root-helper)
-  - [url() or R76::url()](#url-helper)
-  - [uri() or R76::uri()](#uri-helper)
-  - [path() or R76::path()](#path-helper)
-  - [param() or R76::param()](#param-helper)
-  - [params() or R76::params()](#params-helper)
-  - [verb()](#verb-helper)
-  - [async()](#async-helper)
-  - [go()](#go-helper)
+	- [root() or R76::root()](#root-helper)
+	- [url() or R76::url()](#url-helper)
+	- [uri() or R76::uri()](#uri-helper)
+	- [path() or R76::path()](#path-helper)
+	- [param() or R76::param()](#param-helper)
+	- [params() or R76::params()](#params-helper)
+	- [verb()](#verb-helper)
+	- [async()](#async-helper)
+	- [go()](#go-helper)
 
 
 # Start
@@ -50,64 +51,69 @@ The index.php needs to load the system. Here is an example of what it should loo
 
 	<?php
 	$site = include 'site/core/r76.php';
-	$site->config('site/core/CONFIG');
-	$site->run(function() { include 'site/templates/404.php'; });
+	// configuration here
+	$site->run(function() { exit('404 error'); });
 
-The `config()` method could be called using both an array of commands or a file (one command per line).  
 The `run()` method displays the result, and gets a callback in parameter, called when the URL doesn’t match any route configuration. See the [Callbacks section](#callbacks) below to know more about what is posssible to do with.
 
 # Configuration
-The syntax is pretty simple: ‘command parameters’, one command per line, and you can comment a line by starting it with a ‘#’. Commands available: **LOAD**, **ROUTE**, **DEFINE**, **CUSTOM**. This is a sample config file:
+After including r76.php, and before calling `$site->run(…)` that will display your page, you may need to configure routes and load any king of PHP files (libs, helpers…).
 
- 	# System
-		LOAD    site/core
+## load
+Loads all the php files located in the given folder path. E.g.:
 
-	# Routes
-		ROUTE   GET       /               site/templates/default.php
-		ROUTE   GET       /@section       site/templates/@section.php
-		
-It's also possible to call these commands using the `R76::config()` method. Example with the previous index.php file:
+	$site->load('site/core');
 
-	<?php
-	$site = include 'site/core/r76.php';
-	$site->config('LOAD site/core'); // inline command
-	$site->config(array(
-		'ROUTE GET / site/templates/default.php',
-		'ROUTE GET /@section site/templates/@section.php'
-	)); // array of commands
-	$site->config('ROUTE GET /@section/@id', function() {
-		// callback as a second parameter, could be a string too
-	}); 
-	$site->run(function() { include 'site/templates/404.php'; });
+## route, get, post, put, delete
+Configure callbacks for the routes:
 
-## LOAD
-Loads all the php files located in the given folder path. You can set multiple folders to load, simply separate them with any spacing character. E.g.:
+	$site->route('GET', '/', 'site/templates/default.php');
+	$site->route('GET|POST', '/@section', 'site/templates/@section.php');
 
-	LOAD site/core site/helpers site/custom
+You can allow any **verb** (GET, POST, PUT, DELETE) you want to access an url, and combine them by using the ‘|’ separator. E.g.: `GET|POST`.
 
-## ROUTE
-Route syntax is the most tricky, but still intuitive as hell.
+The **url** respects the [path syntax](#syntax-sensibility). Anyway, to match the root, you’ll need to set the url as ‘/’. Note that [GET parameters](#get-parameters) aren’t part of the route. 
 
-	ROUTE verb(s) url callback
+You can use variables in it for dynamic urls, just put an ‘@‘ before the name of the variable you want. To get their value, see [path() method](#path-helper). E.g.: 
 
-You can allow any **verb** (GET, POST, PUT, DELETE) you want to access an url, and combine them by using the ‘|’ separator. The most common usage is: `GET|POST`.
-
-The **url** respects the [path syntax](#syntax-sensibility). Anyway, to match the root, you’ll need to set the url as ‘/’. Note that [GET parameters](#get-parameters) aren’t part of the route. You can use variables in it for dynamic urls, just put an ‘@‘ before the name of the variable you want. To get their value, see [path() method](#path-helper). E.g.: 
-
-	ROUTE GET /articles/@id/comments/page/@page callback
+	$site->route('GET', '/articles/@id/comments/page/@page', $callback);
 
 The **callback** can be a file, a function or a method (see the [Callbacks section](#callbacks) for more information), and is able to use the variables in its name:
 
-	ROUTE GET       /@section               site/templates/@section.php
-	ROUTE GET|POST  /articles/@action/@id   articles->@action  
-	ROUTE GET       /@section/@feature      @section->@feature
+	$site->route('GET', '/@section', 'site/templates/@section.php');
+	$site->route('GET', '/@section/@feature', '@section->@feature');
+	
+You can also configure routes by using the wrappers:
 
-## DEFINE
+	$site->get('/route/path', $callback);
+	$site->post('/route/path', $callback);
+	$site->put('/route/path', $callback);
+	$site->delete('/route/path', $callback);
+	
+## Config file
+Sometimes it's more convinient to gather all these commands in a single file and only write a single line of PHP to configure your website. It's possible, but the syntax changes a bit. E.g.:
+	
+	# This is a comment
+	# Load the core files
+		LOAD site/core
+	
+	# Configure routes
+		ROUTE GET 		/			site/templates/default.php
+		ROUTE GET|POST	/contact	site/templates/contact.php
+		ROUTE GET		/@section	site/templates/@section.php
+		
+Name this file however you want, and call it using:
+	
+	$site->config('path/to/the/config');
+
+To prevent from the frustration of having some extra PHP code lines out of the config file, the config file enables some specific commands:
+
+### define
 Sets a global constant. It’s practical, simply because you can gather all your configuration constants in the same configuration file, like paths, passwords (hashed), services & API codes (google analytics, typekit, etc.) and so on.
 
 	DEFINE key value
 
-## CUSTOM
+### custom
 You can do what you want with the CUSTOM command. This is the syntax:
 
 	CUSTOM callback parameters
@@ -134,7 +140,8 @@ If any spreadsheet url changes, we only have to update the config file, without 
 
 # Tips
 ## Syntax sensibility
-Any path you’ll have to write (in url() function and the configuration file) are parsed to prevent from any bug occuring with the ‘slash’ character confusing use. So you can both write `/path/` or `path/`, and even `path`. Paths on DEFINE values and CUSTOM parameters aren’t parsed.
+Any path you’ll have to write (in url() function and the configuration methods) are parsed to prevent from any bug occuring with the ‘slash’ character confusing use. So you can both write `/path/` or `path/`, and even `path`.  
+**Warning**: paths on DEFINE values and CUSTOM parameters aren’t parsed.
 
 In the configuration command lines, you can use as much inline spacing/tabs characters as you want between the values, except around a ‘|’ separators in ROUTE commands.
 
@@ -153,27 +160,30 @@ Note: GET parameters will be automatically rewrited from `?key=value&key2=value2
 ##  Before and after route callbacks
 You can simply call before and after route callbacks by using this trick:
 
+	<?php
+	$site = include 'site/core/r76.php';
+	$site->load('site/core');
+	
+	beforeRoute(); 
+	// anything above will be executed before the route callback
+	
+	$site->get('/', 'site/templates/default.php');
+	$site->get('/@section', 'site/templates/@section.php');
+	
+	// anything below will be executed after the route callback
+	afterRoute();
+	
+	$site->run(function() { exit('404 error'); });
+	
+Or, in a configuration file:
+
 	CUSTOM beforeRouteCallback
 	# Anything above will be executed before the route callback
 	ROUTE   GET       /               site/templates/default.php
 	ROUTE   GET       /@section       site/templates/@section.php
 	# 	Anything below will be executed after the route callback
 	CUSTOM afterRouteCallback
-	
-Or, if you set the config directly on a PHP file:
 
-	<?php
-	$site = include 'site/core/r76.php';
-	$site->config('LOAD site/core');
-	beforeRoute(); 
-	// anything above will be executed before the route callback
-	$site->config(array(
-		'ROUTE GET / site/templates/default.php',
-		'ROUTE GET /@section site/templates/@section.php'
-	)); 
-	// anything below will be executed after the route callback
-	afterRoute();
-	$site->run(function() { include 'site/templates/404.php'; });
 
 # Helpers and R76 public methods
 Some values and functions are avaiable to manipulate anything related to URLs and template files. Those functions are avaible in all your files.

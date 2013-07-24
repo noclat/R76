@@ -17,17 +17,17 @@
     }
 
   # Perform config (e.g. file|array|string)
-    function config($cmd, $callback = false) {
+    function config($cmd) {
       if (is_file($cmd)) $cmd = preg_split('/\v/m', file_get_contents($cmd));
       if (is_array($cmd)) return array_map(__METHOD__, $cmd);
-      $cmd = trim($cmd);
-      if ($cmd{0} == '#' OR empty($cmd)) return;
-      $param = preg_split('/\h+/', $cmd);
+      if (!is_string($cmd)) throw new Exception('Config — Command should be a string');
+      $param = preg_split('/\h+/', trim($cmd));
+      if ($param[0]{0} == '#' OR count($param) < 2) return;
       switch (strtolower(array_shift($param))) {
-        case 'load': if (!$this->load($param)) throw new Exception('Config - Unexisting folder(s): '.$cmd); break;
-        case 'route': if (!$this->callback) $this->route(array_merge($param, (array)$callback)); break;
-        case 'define': if (!define($param[0], $param[1])) throw new Exception('Config - Wrong syntax: '.$cmd); break;
-        case 'custom': if (!$this->call(array_shift($param), $param)) throw new Exception('Config - Wrong syntax or callback: '.$cmd); break;
+        case 'load': $this->load($param[0]); break;
+        case 'route': $this->route($param[0], $param[1], $param[2]); break;
+        case 'define': if (!define($param[0], $param[1])) throw new Exception('Define - Wrong syntax: '.$cmd); break;
+        case 'custom': if (!$this->call(array_shift($param), $param)) throw new Exception('Custom - Wrong syntax or callback: '.$cmd); break;
         default: throw new Exception('Config - Unknown command: '.$cmd); break;
       }
     }
@@ -48,18 +48,18 @@
       return ob_end_flush();
     }
 
-  # Load given PHP files (e.g. path/dir1;path/dir2;...)
-    private function load($path) {
-      if (is_array($path)) return array_map(__METHOD__, $path);
-      foreach (glob(trim($path, '/').'/*.php') as $file) include_once $file;
-      return is_dir($path);
+  # Load PHP files in the given folder (e.g. site/core)
+    function load($path) {
+      if (!is_dir($path = trim($path, '/'))) throw new Exception('Load - Unknown folder: '.$path);
+      foreach (glob($path.'/*.php') as $file) include_once $file;
     }
 
   # Match route (e.g. GET|POST|PUT|DELETE /path/with/@var path/to/file.ext|func()|class->method()). Note: you can use '@var' in callbacks
-    private function route($params) {
-      list ($verb, $route, $callback) = $params;
-      $route = trim($route, '/');
-      if (preg_match('/^(?:'.$verb.') '.preg_replace('/@[a-z0-9_]+/i', '([a-z0-9_-]+)', preg_quote($route, '/')).'$/i', $_SERVER['REQUEST_METHOD'].' '.$this->uri(), $m)) {
+    function __call($f, $args) { if (in_array($f, explode(',', 'get,put,post,delete'))) $this->route($f, $args[0], $args[1]); else throw new Exception('Invalid method: '.$f); }
+    function route($verb, $route, $callback) {
+      if ($this->callback) return;
+      if (!is_string($route = trim($route, '/')) OR !is_string($verb)) throw new Exception('Route — First two parameters should be strings.');
+      if (preg_match('/^(?:'.strtolower($verb).') '.preg_replace('/@[a-z0-9_]+/i', '([a-z0-9_-]+)', preg_quote($route, '/')).'$/i', strtolower($_SERVER['REQUEST_METHOD']).' '.$this->uri(), $m)) {
         $tmp = $this->path = array_combine(explode('/', str_replace('@', '', $route)), $this->path);
         $this->callback = !is_string($callback) ? $callback : preg_replace_callback('/@([a-z0-9_]+)/i', function($m) use ($tmp) { return $tmp[$m[1]]; }, trim($callback, '/'));
       }
