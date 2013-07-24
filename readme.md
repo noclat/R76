@@ -88,7 +88,7 @@ Loads all the php files located in the given folder path. You can set multiple f
 ## ROUTE
 Route syntax is the most tricky, but still intuitive as hell.
 
-	ROUTE verbs url callbacks
+	ROUTE verb(s) url callback
 
 You can allow any **verb** (GET, POST, PUT, DELETE) you want to access an url, and combine them by using the ‘|’ separator. The most common usage is: `GET|POST`.
 
