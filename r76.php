@@ -1,13 +1,13 @@
 <?php
 # R76 by Nicolas Torres (76.io), CC BY-SA license: creativecommons.org/licenses/by-sa/3.0
-  class R76 { static function __callstatic($f, array $args) { return call_user_func_array(array(R76_base::instance(), $f), $args); } }
+  class R76 { public static function __callstatic($f, array $args) { return call_user_func_array(array(R76_base::instance(), $f), $args); } }
   final class R76_base {
     private static $instance; private $root, $path = array(), $callback = false;
-    static function instance() { if(!self::$instance) self::$instance = new self(); return self::$instance; }
-    function __clone() {}
+    public static function instance() { if(!self::$instance) self::$instance = new self(); return self::$instance; }
+    private final function __clone() { }
 
   # Parse URI and params & rewrite GET params (e.g. URI?search=terms&page=2 => URI/search:terms/page:2)
-    function __construct() {
+    public function __construct() {
       if (count($_GET)) { header('location://'.trim(strstr($_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'], '?', true), '/').'/'.strtr(http_build_query($_GET), '=&', ':/')); exit; }
       $this->root = '//'.trim($_SERVER['HTTP_HOST'].dirname($_SERVER['PHP_SELF']), '/').'/';
       $uri = explode('/', trim(substr('//'.$_SERVER['HTTP_HOST'].$_SERVER["REQUEST_URI"], strlen($this->root)), '/'));
@@ -17,7 +17,7 @@
     }
 
   # Perform config (e.g. file|array|string)
-    function config($cmd) {
+    public function config($cmd) {
       if (is_file($cmd)) $cmd = preg_split('/\v/m', file_get_contents($cmd));
       if (is_array($cmd)) return array_map(__METHOD__, $cmd);
       if (!is_string($cmd)) throw new Exception('Config — Command should be a string');
@@ -33,30 +33,30 @@
     }
 
   # Get URL components
-    function root() { return $this->root; }
-    function uri() { return implode('/', $this->path); }
-    function path($k) { return $this->path[$k]; }
-    function url($uri = false, $params = array()) {
+    public function root() { return $this->root; }
+    public function uri() { return implode('/', $this->path); }
+    public function path($k) { return $this->path[$k]; }
+    public function url($uri = false, $params = array()) {
       if (is_array($uri)) $params = array_replace($_GET, $uri);
       elseif ($uri === false) $params = $_GET;
       return $this->root.(($uri !== false AND !is_array($uri))?trim($uri, "/ \t\n\r\0\x0B"):$this->uri()).(count($params)?'/'.strtr(http_build_query($params), '=&', ':/'):'');
     }
 
   # Call the callback file|function|method
-    function run($default = false) {
+    public function run($default = false) {
       if (!$this->call($this->callback) AND !$this->call($default)) throw new Exception('Run - Unknown callback: '.$this->callback.' or default: '.$default);
       return ob_end_flush();
     }
 
   # Load PHP files in the given folder (e.g. site/core)
-    function load($path) {
+    public function load($path) {
       if (!is_dir($path = trim($path, '/'))) throw new Exception('Load - Unknown folder: '.$path);
       foreach (glob($path.'/*.php') as $file) include_once $file;
     }
 
-  # Match route (e.g. GET|POST|PUT|DELETE /path/with/@var path/to/file.ext|func()|class->method()). Note: you can use '@var' in callbacks
-    function __call($f, $args) { if (in_array($f, explode(',', 'get,put,post,delete'))) $this->route($f, $args[0], $args[1]); else throw new Exception('Invalid method: '.$f); }
-    function route($verb, $route, $callback) {
+  # Match route (e.g. GET|POST|PUT|DELETE, /path/with/@var, path/to/file.ext|func()|class->method()). Note: you can use '@var' in callbacks
+    public function __call($f, $args) { if (in_array($f, explode(',', 'get,put,post,delete'))) $this->route($f, $args[0], $args[1]); else throw new Exception('Invalid method: '.$f); }
+    public function route($verb, $route, $callback) {
       if ($this->callback) return;
       if (!is_string($route = trim($route, '/')) OR !is_string($verb)) throw new Exception('Route — First two parameters should be strings.');
       if (preg_match('/^(?:'.strtolower($verb).') '.preg_replace('/@[a-z0-9_]+/i', '([a-z0-9_-]+)', preg_quote($route, '/')).'$/i', strtolower($_SERVER['REQUEST_METHOD']).' '.$this->uri(), $m)) {

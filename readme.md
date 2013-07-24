@@ -106,7 +106,7 @@ Name this file however you want, and call it using:
 	
 	$site->config('path/to/the/config');
 
-To prevent from the frustration of having some extra PHP code lines out of the config file, the config file enables some specific commands:
+To prevent from the frustration of having some extra PHP code lines out of the config file, it enables some specific commands:
 
 ### define
 Sets a global constant. It’s practical, simply because you can gather all your configuration constants in the same configuration file, like paths, passwords (hashed), services & API codes (google analytics, typekit, etc.) and so on.
