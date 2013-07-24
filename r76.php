@@ -4,7 +4,6 @@
   final class R76_base {
     private static $instance; private $root, $path = array(), $callback = false;
     public static function instance() { if(!self::$instance) self::$instance = new self(); return self::$instance; }
-    private final function __clone() { }
 
   # Parse URI and params & rewrite GET params (e.g. URI?search=terms&page=2 => URI/search:terms/page:2)
     public function __construct() {
@@ -16,13 +15,12 @@
       return ob_start();
     }
 
-  # Perform config (e.g. file|array|string)
+  # Perform config from file
     public function config($cmd) {
-      if (is_file($cmd)) $cmd = preg_split('/\v/m', file_get_contents($cmd));
-      if (is_array($cmd)) return array_map(__METHOD__, $cmd);
+      if (is_file($cmd)) return array_map(__METHOD__, preg_split('/\v/m', file_get_contents($cmd)));
       if (!is_string($cmd)) throw new Exception('Config — Command should be a string');
       $param = preg_split('/\h+/', trim($cmd));
-      if ($param[0]{0} == '#' OR count($param) < 2) return;
+      if ($param[0]{0} == '#' OR empty($param[0])) return;
       switch (strtolower(array_shift($param))) {
         case 'load': $this->load($param[0]); break;
         case 'route': $this->route($param[0], $param[1], $param[2]); break;
@@ -54,8 +52,7 @@
       foreach (glob($path.'/*.php') as $file) include_once $file;
     }
 
-  # Match route (e.g. GET|POST|PUT|DELETE, /path/with/@var, path/to/file.ext|func()|class->method()). Note: you can use '@var' in callbacks
-    public function __call($f, $args) { if (in_array($f, explode(',', 'get,put,post,delete'))) $this->route($f, $args[0], $args[1]); else throw new Exception('Invalid method: '.$f); }
+  # Match route (e.g. GET|POST|PUT|DELETE, /path/with/@var, path/to/file.ext|func()|class->method()). Note: you can use '@var' in callbacks.
     public function route($verb, $route, $callback) {
       if ($this->callback) return;
       if (!is_string($route = trim($route, '/')) OR !is_string($verb)) throw new Exception('Route — First two parameters should be strings.');
@@ -64,6 +61,9 @@
         $this->callback = !is_string($callback) ? $callback : preg_replace_callback('/@([a-z0-9_]+)/i', function($m) use ($tmp) { return $tmp[$m[1]]; }, trim($callback, '/'));
       }
     }
+    
+  # Wrappers: get, post, put, delete
+    public function __call($f, $args) { if (in_array($f, explode(',', 'get,put,post,delete'))) $this->route($f, $args[0], $args[1]); else throw new Exception('R76 — Invalid method: '.$f); }
 
   # Call user file|function|method
     private function call($f, $args = false) {
