@@ -8,7 +8,7 @@ See [Eye Fracture source](http://github.com/noclat/eyefracture.com) to get an ex
 # Documentation
 - [Start](#start)
 - [Load the system](#load-the-system)
-- [Configuration file](#configuration-file)
+- [Configuration](#configuration)
   - [LOAD](#load)
   - [ROUTE](#route)
   - [DEFINE](#define)
