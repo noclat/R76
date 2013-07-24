@@ -215,14 +215,14 @@ If `$key` is numeric, it returns the nth part (zero-based) of the URI.
 	echo path(2); // will return ‘134’
   
 <a name="param-helper"/>
-## param($key) or R76::param($key)
+## param($key)
 Return the value of the GET parameter `$key`. It's the same than $_GET[$key].
 
 	// current url: articles/tag:webdesign
 	echo param(‘tag’); // will return ‘webdesign’
 	
 <a name="params-helper"/>
-## params() or R76::params()
+## params()
 Return an associative array of the GET parameters, strickly the same as `$_GET` values.
 
 <a name="verb-helper"/>
