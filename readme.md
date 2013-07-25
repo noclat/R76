@@ -5,6 +5,8 @@ R76 is shared under a [CC BY-SA license](http://creativecommons.org/licenses/by-
 
 See [Eye Fracture source](http://github.com/noclat/eyefracture.com) to get a full exemple of R76 usage.
 
+Special thanks to [dhoko](http://github.com/dhoko) for his feedbacks.
+
 # Documentation
 - [Getting started](#getting-started)
 - [Load the system](#load-the-system)
@@ -84,7 +86,7 @@ You can also configure routes by using the wrappers:
 	$site->put('/route/path', $callback);
 	$site->delete('/route/path', $callback);
 	
-## Config file
+## config
 Sometimes it's more convinient to gather all these commands in a single file and only write a single line of PHP to configure your website. It's possible, but the syntax changes a bit. E.g.:
 	
 	# This is a comment
