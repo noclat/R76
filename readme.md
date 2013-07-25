@@ -6,14 +6,11 @@ R76 is shared under a [CC BY-SA license](http://creativecommons.org/licenses/by-
 See [Eye Fracture source](http://github.com/noclat/eyefracture.com) to get a full exemple of R76 usage.
 
 # Documentation
-- [Start](#start)
+- [Getting started](#getting-started)
 - [Load the system](#load-the-system)
 - [Configuration](#configuration)
-	- [load](#load)
 	- [route, get, post, put, delete](#route-get-post-put-delete)
-	- [Config file](#config-file)
-		- [define](#define)
-		- [custom](#custom)
+	- [config](#config)
 - [Tips](#tips)
 	- [Syntax sensibility](#syntax-sensibility)
 	- [Callbacks](#callbacks)
@@ -28,10 +25,11 @@ See [Eye Fracture source](http://github.com/noclat/eyefracture.com) to get a ful
 	- [params() or R76::params()](#params-helper)
 	- [verb()](#verb-helper)
 	- [async()](#async-helper)
+	- [load()](#load-helper)
 	- [go()](#go-helper)
 
 
-# Start
+# Getting started
 You can relocate the `r76.php` and `helpers.php` files. Start creating an `index.php` file at the top level. Don’t forget to update the protected directory path on the `.htaccess`. An example of file tree:
 
 	./
@@ -43,13 +41,14 @@ You can relocate the `r76.php` and `helpers.php` files. Start creating an `index
 				r76.php
 				helpers.php
 				CONFIG
-				(and any other helpers)
+				(and any other helpers & libs)
 			templates/    (or any design pattern you want to use)
 
 # Load the system
 The index.php needs to load the system. Here is an example of what it should looks like:
 
 	<?php
+	include 'site/core/helpers.php';
 	$site = include 'site/core/r76.php';
 	// configuration here
 	$site->run(function() { exit('404 error'); });
@@ -57,12 +56,7 @@ The index.php needs to load the system. Here is an example of what it should loo
 The `run()` method displays the result, and gets a callback in parameter, called when the URL doesn’t match any route configuration. See the [Callbacks section](#callbacks) below to know more about what is posssible to do with.
 
 # Configuration
-After including r76.php, and before calling `$site->run(…)` that will display your page, you may need to configure routes and load any king of PHP files (libs, helpers…).
-
-## load
-Loads all the php files located in the given folder path. E.g.:
-
-	$site->load('site/core');
+After including r76.php, and before calling `$site->run(…)` that will display your page, you may need to configure routes callback.
 
 ## route, get, post, put, delete
 Configure callbacks for the routes:
@@ -70,7 +64,7 @@ Configure callbacks for the routes:
 	$site->route('GET', '/', 'site/templates/default.php');
 	$site->route('GET|POST', '/@section', 'site/templates/@section.php');
 
-You can allow any **verb** (GET, POST, PUT, DELETE) you want to access an url, and combine them by using the ‘|’ separator. E.g.: `GET|POST`.
+You can allow any **verb** (GET, POST, PUT, DELETE) you want to access an url, and combine them by using the ‘|’ separator. E.g.: `POST|PUT|GET`.
 
 The **url** respects the [path syntax](#syntax-sensibility). Anyway, to match the root, you’ll need to set the url as ‘/’. Note that [GET parameters](#get-parameters) aren’t part of the route. 
 
@@ -78,7 +72,7 @@ You can use variables in it for dynamic urls, just put an ‘@‘ before the nam
 
 	$site->route('GET', '/articles/@id/comments/page/@page', $callback);
 
-The **callback** can be a file, a function or a method (see the [Callbacks section](#callbacks) for more information), and is able to use the variables in its name:
+The **callback** can be a file, an anonymous function, and a function or a method name (see the [Callbacks section](#callbacks) for more information), and is able to use the variables in its name:
 
 	$site->route('GET', '/@section', 'site/templates/@section.php');
 	$site->route('GET', '/@section/@feature', '@section->@feature');
@@ -94,54 +88,31 @@ You can also configure routes by using the wrappers:
 Sometimes it's more convinient to gather all these commands in a single file and only write a single line of PHP to configure your website. It's possible, but the syntax changes a bit. E.g.:
 	
 	# This is a comment
-	# Load the core files
-		LOAD site/core
-	
 	# Configure routes
-		ROUTE GET 		/			site/templates/default.php
-		ROUTE GET|POST	/contact	site/templates/contact.php
-		ROUTE GET		/@section	site/templates/@section.php
+		ROUTE GET 			/			site/templates/default.php
+		ROUTE GET|POST		/contact	site/templates/contact.php
+		ROUTE GET			/@section	site/templates/@section.php
 		
 Name this file however you want, and call it using:
 	
 	$site->config('path/to/the/config');
 
-To prevent from the frustration of having some extra PHP code lines out of the config file, it enables some specific commands:
+To prevent from the frustration of having some extra PHP code lines out of the config file, it enables a CALL commands. This is the syntax:
 
-### define
-Sets a global constant. It’s practical, simply because you can gather all your configuration constants in the same configuration file, like paths, passwords (hashed), services & API codes (google analytics, typekit, etc.) and so on.
+	CALL callback parameters
+	
+It’s just calling a callback (function or method) with the given parameters (optional). The parameters syntax is simple, just use any spacing character between them: `parameter1 parameter2 parameter3…`. 
 
-	DEFINE key value
+It could be useful to define constants, load PHP files (with the [load helper](#load-helper)) and do many other things.
 
-### custom
-You can do what you want with the CUSTOM command. This is the syntax:
-
-	CUSTOM callback parameters
-
-It’s just calling a callback (function or method) with the given the parameters (optional). The parameters syntax is simple, just use any spacing character between them: `parameter1 parameter2 parameter3…`. It could help if you need to parse some configuration values, for example an external URL (from any API or service like Google Documents), or set a bunch of related ‘constants’.
-
-Here’s a real life example, used for [Eye Fracture](http://eyefracture.com), which database is stored in 4 Google Spreadsheets:
-
-	CUSTOM  sheets::set   videos    https://docs.google.com/spreadsheet/pub?key=XXX&single=true&gid=0&output=csv
-	CUSTOM  sheets::set   lists     https://docs.google.com/spreadsheet/pub?key=XXX&single=true&gid=1&output=csv
-	CUSTOM  sheets::set   studios   https://docs.google.com/spreadsheet/pub?key=XXX&single=true&gid=3&output=csv
-	CUSTOM  sheets::set   quotes    https://docs.google.com/spreadsheet/pub?key=XXX&single=true&gid=2&output=csv
-
-And here’s the callback:
-
-	class sheets {
-		...
-		function set($key, $url) { self::$sheets[$key] = $url; }
-		...
-	}
-
-If any spreadsheet url changes, we only have to update the config file, without getting deep in the code to update the related lines.
+	CALL load site/core
+	CALL define key value
 
 
 # Tips
 ## Syntax sensibility
 Any path you’ll have to write (in url() function and the configuration methods) are parsed to prevent from any bug occuring with the ‘slash’ character confusing use. So you can both write `/path/` or `path/`, and even `path`.  
-**Warning**: paths on DEFINE values and CUSTOM parameters aren’t parsed.
+**Warning**: paths on CALL parameters aren’t parsed.
 
 In the configuration command lines, you can use as much inline spacing/tabs characters as you want between the values, except around a ‘|’ separators in ROUTE commands.
 
@@ -150,7 +121,9 @@ Commands are not case sensitive, but paths are.
 The URLs could be written both **with or without any extension**. `//example.com/sitemap` and `//example.com/sitemap.xml` are equaly regarded by the framework. Make sure the extension doesn't appear in the ROUTE command.
 
 ## Callbacks
-Callbacks could be files, functions or methods. If it’s a file, it will just be included (and executed). If it’s a function or a method, just give the name, without the parenthesis. Examples: `load`, `articles::read`, `article->read` — in this last case, the ‘article’ class will be instanciated and the `__construct()` method will be triggered.
+Callbacks could be files, anonymous functions, and function or method names. If it’s a file, it will just be included (and executed). If it’s a function or a method name, just pass the name, without the parenthesis. Examples: `load`, `articles::read`, `article->read` — in this last case, the ‘article’ class will be instanciated and the `__construct()` method will be triggered.
+
+**Warning**: callbacks in a configuration file can not be anonymous functions since it's a string.
 
 ## GET parameters
 GET parameters aren’t part of the route. Any callback of `/articles/archives` url and `/articles/archives/sort:year%20asc` will be the same. You can access those parameters in your code to make changes according to their values.
@@ -161,29 +134,17 @@ Note: GET parameters will be automatically rewrited from `?key=value&key2=value2
 You can simply call before and after route callbacks by using this trick:
 
 	<?php
-	$site = include 'site/core/r76.php';
-	$site->load('site/core');
+	// configuration…
 	
 	beforeRoute(); 
-	// anything above will be executed before the route callback
+	// anything above run will be executed before the route callback
 	
-	$site->get('/', 'site/templates/default.php');
-	$site->get('/@section', 'site/templates/@section.php');
+	$site->run(function() { exit('404 error'); });
 	
 	// anything below will be executed after the route callback
 	afterRoute();
 	
-	$site->run(function() { exit('404 error'); });
-	
-Or, in a configuration file:
-
-	CUSTOM beforeRouteCallback
-	# Anything above will be executed before the route callback
-	ROUTE   GET       /               site/templates/default.php
-	ROUTE   GET       /@section       site/templates/@section.php
-	# 	Anything below will be executed after the route callback
-	CUSTOM afterRouteCallback
-
+Note that in a configuration file, any CALL command will be executed before the route callback.
 
 # Helpers and R76 public methods
 Some values and functions are avaiable to manipulate anything related to URLs and template files. Those functions are avaible in all your files.
@@ -197,7 +158,7 @@ Returns the complete adress of your website.
 ### 0 parameter
 Returns the complete current url.
 
-### 1 string array parameter
+### 1 string parameter
 Returns the absolute protocle-free url of a relative path. `url(‘articles/archives’)` will return `//yourdomain.com/articles/archives`. This works both for http and https urls.
 
 ### 1 associative array parameter
@@ -209,7 +170,7 @@ Returns the same url, but changes the specified parameters. Example: the current
 
 will return the absolute url of `article/read/4/showcomments:true/commentspage:5`.
 
-### 1 string array + 1 associative array parameter
+### 1 string + 1 associative array parameters
 Returns the absolute url, adding the parameters.
 
 	echo url(‘article/read/4’, array(
@@ -254,6 +215,10 @@ Returns the current verb (GET, POST, PUT, DELETE). Note: it returns the value of
 <a name="async-helper"/>
 ## async()
 Returns true if you’re using an AJAX request, and false if not. What defines an AJAX request is the value of the `X_REQUESTED_WITH` header set to `XMLHttpRequest`, used in nearly all of the JavaScript libraries that send AJAX requests.
+
+<a name="load-helper"/>
+## load($path)
+Loads all the php files located in the given folder path.
 
 <a name="go-helper"/>
 ## go($location)

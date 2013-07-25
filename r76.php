@@ -1,9 +1,9 @@
 <?php
 # R76 by Nicolas Torres (76.io), CC BY-SA license: creativecommons.org/licenses/by-sa/3.0
-  class R76 { public static function __callstatic($f, array $args) { return call_user_func_array(array(R76_base::instance(), $f), $args); } }
   final class R76_base {
     private static $instance; private $root, $path = array(), $callback = false;
     public static function instance() { if(!self::$instance) self::$instance = new self(); return self::$instance; }
+    private function __clone() {}
 
   # Parse URI and params & rewrite GET params (e.g. URI?search=terms&page=2 => URI/search:terms/page:2)
     public function __construct() {
@@ -22,10 +22,8 @@
       $param = preg_split('/\h+/', trim($cmd));
       if ($param[0]{0} == '#' OR empty($param[0])) return;
       switch (strtolower(array_shift($param))) {
-        case 'load': $this->load($param[0]); break;
         case 'route': $this->route($param[0], $param[1], $param[2]); break;
-        case 'define': if (!define($param[0], $param[1])) throw new Exception('Define - Wrong syntax: '.$cmd); break;
-        case 'custom': if (!$this->call(array_shift($param), $param)) throw new Exception('Custom - Wrong syntax or callback: '.$cmd); break;
+        case 'call': if (!$this->call(array_shift($param), $param)) throw new Exception('Call - Wrong syntax or callback: '.$cmd); break;
         default: throw new Exception('Config - Unknown command: '.$cmd); break;
       }
     }
@@ -34,6 +32,8 @@
     public function root() { return $this->root; }
     public function uri() { return implode('/', $this->path); }
     public function path($k) { return $this->path[$k]; }
+    
+  # Get URL: (void, void) -> current URL, (arr, void) -> current URL + updated params, (str, arr) -> new URL + new params
     public function url($uri = false, $params = array()) {
       if (is_array($uri)) $params = array_replace($_GET, $uri);
       elseif ($uri === false) $params = $_GET;
@@ -44,12 +44,6 @@
     public function run($default = false) {
       if (!$this->call($this->callback) AND !$this->call($default)) throw new Exception('Run - Unknown callback: '.$this->callback.' or default: '.$default);
       return ob_end_flush();
-    }
-
-  # Load PHP files in the given folder (e.g. site/core)
-    public function load($path) {
-      if (!is_dir($path = trim($path, '/'))) throw new Exception('Load - Unknown folder: '.$path);
-      foreach (glob($path.'/*.php') as $file) include_once $file;
     }
 
   # Match route (e.g. GET|POST|PUT|DELETE, /path/with/@var, path/to/file.ext|func()|class->method()). Note: you can use '@var' in callbacks.
@@ -63,7 +57,10 @@
     }
     
   # Wrappers: get, post, put, delete
-    public function __call($f, $args) { if (in_array($f, explode(',', 'get,put,post,delete'))) $this->route($f, $args[0], $args[1]); else throw new Exception('R76 — Invalid method: '.$f); }
+    public function __call($f, $args) { 
+      if (!in_array($f, explode(',', 'get,put,post,delete'))) throw new Exception('R76 — Invalid method: '.$f);
+      $this->route($f, $args[0], $args[1]);
+    }
 
   # Call user file|function|method
     private function call($f, $args = false) {
@@ -73,4 +70,7 @@
       else return false; return true;
     }
   } 
+  
+# Singleton pattern & return instance
+  class R76 { public static function __callstatic($f, array $args) { return call_user_func_array(array(R76_base::instance(), $f), $args); } }
   return R76_base::instance();
