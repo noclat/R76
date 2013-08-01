@@ -2,30 +2,15 @@
 # R76 by Nicolas Torres (76.io), CC BY-SA license: creativecommons.org/licenses/by-sa/3.0
   final class R76_base {
     private static $instance; private $root, $path = array(), $callback = false;
-    public static function instance() { if(!self::$instance) self::$instance = new self(); return self::$instance; }
-    private function __clone() {}
 
   # Parse URI and params & rewrite GET params (e.g. URI?search=terms&page=2 => URI/search:terms/page:2)
     public function __construct() {
       if (count($_GET)) { header('location://'.trim(strstr($_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'], '?', true), '/').'/'.strtr(http_build_query($_GET), '=&', ':/')); exit; }
       $this->root = '//'.trim($_SERVER['HTTP_HOST'].dirname($_SERVER['PHP_SELF']), '/').'/';
       $uri = explode('/', trim(substr('//'.$_SERVER['HTTP_HOST'].$_SERVER["REQUEST_URI"], strlen($this->root)), '/'));
-      foreach ($uri as $p) if (strpos($p, ':') !== false) { list ($k, $v) = explode(':', $p); $_GET[$k] = trim(urldecode($v)); }
+      foreach ($uri as $chunk) if (strpos($chunk, ':') !== false) { list ($k, $v) = explode(':', $chunk); $_GET[$k] = trim(urldecode($v)); }
       $this->path = explode('/', preg_replace('/\.[a-z]+$/i', '', implode('/', array_slice($uri, 0, count($uri)-count($_GET)))));
       return ob_start();
-    }
-
-  # Perform config from file
-    public function config($cmd) {
-      if (is_file($cmd)) return array_map(__METHOD__, preg_split('/\v/m', file_get_contents($cmd)));
-      if (!is_string($cmd)) throw new Exception('Config — Command should be a string');
-      $param = preg_split('/\h+/', trim($cmd));
-      if ($param[0]{0} == '#' OR empty($param[0])) return;
-      switch (strtolower(array_shift($param))) {
-        case 'route': $this->route($param[0], $param[1], $param[2]); break;
-        case 'call': if (!$this->call(array_shift($param), $param)) throw new Exception('Call - Wrong syntax or callback: '.$cmd); break;
-        default: throw new Exception('Config - Unknown command: '.$cmd); break;
-      }
     }
 
   # Get URL components
@@ -48,29 +33,44 @@
 
   # Match route (e.g. GET|POST|PUT|DELETE, /path/with/@var, path/to/file.ext|func()|class->method()). Note: you can use '@var' in callbacks.
     public function route($verb, $route, $callback) {
-      if ($this->callback) return;
+      if ($this->callback) return true;
       if (!is_string($route = trim($route, '/')) OR !is_string($verb)) throw new Exception('Route — First two parameters should be strings.');
       if (preg_match('/^(?:'.strtolower($verb).') '.preg_replace('/@[a-z0-9_]+/i', '([a-z0-9_-]+)', preg_quote($route, '/')).'$/i', strtolower($_SERVER['REQUEST_METHOD']).' '.$this->uri(), $m)) {
         $tmp = $this->path = array_combine(explode('/', str_replace('@', '', $route)), $this->path);
         $this->callback = !is_string($callback) ? $callback : preg_replace_callback('/@([a-z0-9_]+)/i', function($m) use ($tmp) { return $tmp[$m[1]]; }, trim($callback, '/'));
-      }
+      } return true;
     }
     
   # Wrappers: get, post, put, delete
-    public function __call($f, $args) { 
-      if (!in_array($f, explode(',', 'get,put,post,delete'))) throw new Exception('R76 — Invalid method: '.$f);
-      $this->route($f, $args[0], $args[1]);
+    public function __call($func, $args) { 
+      if (!in_array($func, explode(',', 'get,put,post,delete'))) throw new Exception('R76 — Invalid method: '.$func);
+      $this->route($func, $args[0], $args[1]);
+    }
+
+  # Perform config from file
+    public function config($file) {
+      if (!is_file($file)) throw new Exception('Config — Invalid file: '.$file);
+      foreach (array_map('trim', preg_split('/\v/m', file_get_contents($file))) as $cmd) {
+        if ($cmd{0} == '#' OR empty($cmd)) continue;
+        $param = preg_split('/\h+/', $cmd);
+        if (!call_user_func_array(array($this, strtolower(array_shift($param))), $param)) throw new Exception('Config - Unknown command: '.$cmd);
+      }
     }
 
   # Call user file|function|method
-    private function call($f, $args = false) {
-      if (is_callable($f)) call_user_func_array($f, (array)$args);
-      elseif (is_file((string)$f)) include $f;
-      elseif (preg_match('/(.+)->(.+)/', (string)$f, $m) AND is_callable($f = array(new $m[1], $m[2]))) call_user_func_array($f, (array)$args);
+    private function call() {
+      $args = func_get_args();
+      if (is_callable($func = array_shift($args))) call_user_func_array($func, (array)$args);
+      elseif (is_file((string)$func)) include $func;
+      elseif (preg_match('/(.+)->(.+)/', (string)$func, $m) AND is_callable($func = array(new $m[1], $m[2]))) call_user_func_array($func, (array)$args);
       else return false; return true;
     }
+    
+  # Singleton pattern
+    public static function instance() { if(!self::$instance) self::$instance = new self(); return self::$instance; }
+    private function __clone() {}
   } 
   
-# Singleton pattern & return instance
-  class R76 { public static function __callstatic($f, array $args) { return call_user_func_array(array(R76_base::instance(), $f), $args); } }
+# R76 Static call class & return instance
+  class R76 { public static function __callstatic($func, array $args) { return call_user_func_array(array(R76_base::instance(), $func), $args); } }
   return R76_base::instance();
