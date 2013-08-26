@@ -16,7 +16,7 @@
   # Get URL components
     public function root() { return $this->root; }
     public function uri() { return implode('/', $this->path); }
-    public function path($k) { return $this->path[$k]; }
+    public function path($k) { $p = is_int($k)?array_values($this->path):$this->path; return $p[$k]; }
     
   # Get URL: (void, void) -> current URL, (arr, void) -> current URL + updated params, (str, arr) -> new URL + new params
     public function url($uri = false, $params = array()) {
