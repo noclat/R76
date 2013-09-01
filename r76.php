@@ -18,7 +18,7 @@ final class R76_base
     {
         if (count($_GET)) {
 
-            header('location://'.trim(strstr($_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'], '?', true), '/').'/'.strtr(http_build_query($_GET), '=&', ':/')); exit; 
+            header('location://'.trim(strstr($_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'], '?', true), '/').'/'.strtr(http_build_query($_GET), '=&', ':/')); exit;
         }
 
         $this->root = '//'.trim($_SERVER['HTTP_HOST'].dirname($_SERVER['PHP_SELF']), '/').'/';
@@ -27,10 +27,10 @@ final class R76_base
 
         foreach ($uri as $chunk) {
 
-            if (strpos($chunk, ':') !== false) { 
+            if (strpos($chunk, ':') !== false) {
 
-                list ($k, $v) = explode(':', $chunk); 
-                $_GET[$k] = trim(urldecode($v)); 
+                list ($k, $v) = explode(':', $chunk);
+                $_GET[$k] = trim(urldecode($v));
             }
         }
 
@@ -42,14 +42,15 @@ final class R76_base
     # Get URL components
     public function root() { return $this->root; }
 
-    public function uri() { 
-        return implode('/', $this->path); 
+    public function uri()
+    {
+        return implode('/', $this->path);
     }
 
-    public function path($k) { 
-
-        $p = is_int($k) ? array_values($this->path) : $this->path; 
-        return $p[$k]; 
+    public function path($k)
+    {
+        $p = is_int($k) ? array_values($this->path) : $this->path;
+        return $p[$k];
     }
 
     /**
@@ -63,13 +64,13 @@ final class R76_base
      */
     public function url($uri = false, $params = array())
     {
-    
+
         if (is_array($uri)) {
             $params = array_replace($_GET, $uri);
         }elseif ($uri === false) {
             $params = $_GET;
         }
-    
+
         return $this->root.(($uri !== false AND !is_array($uri))?trim($uri, "/ \t\n\r\0\x0B"):$this->uri()).(count($params)?'/'.strtr(http_build_query($params), '=&', ':/'):'');
     }
 
@@ -113,7 +114,7 @@ final class R76_base
             $tmp = $this->path = array_combine(explode('/', str_replace('@', '', $route)), $this->path);
 
             $this->callback = !is_string($callback) ? $callback : preg_replace_callback('/@([a-z0-9_]+)/i', function($m) use ($tmp) { return $tmp[$m[1]]; }, trim($callback, '/'));
-        } 
+        }
         return true;
     }
 
@@ -167,18 +168,15 @@ final class R76_base
         if ( is_callable($func = array_shift($args)) ) {
 
             call_user_func_array($func, (array)$args);
-        }
-        elseif (is_file((string)$func)) {
+        } elseif (is_file((string)$func)) {
 
             include $func;
-        }
-        elseif ( preg_match('/(.+)->(.+)/', (string)$func, $m) AND is_callable($func = array(new $m[1], $m[2])) ) {
+        } elseif ( preg_match('/(.+)->(.+)/', (string)$func, $m) AND is_callable($func = array(new $m[1], $m[2])) ) {
 
             call_user_func_array($func, (array)$args);
-        }
-        else {
+        } else {
             return false;
-        } 
+        }
 
         return true;
     }
@@ -187,10 +185,10 @@ final class R76_base
      * Singleton pattern
      * @return R76_base
      */
-    public static function instance() { 
-
+    public static function instance()
+    {
         if(!self::$instance) {
-            self::$instance = new self(); 
+            self::$instance = new self();
         }
 
         return self::$instance;
@@ -210,13 +208,13 @@ class R76
      * @param  array  $args [description]
      * @return [type]       [description]
      */
-    public static function __callstatic($func, array $args) { 
-
+    public static function __callstatic($func, array $args)
+    {
         return call_user_func_array(
-                  array(R76_base::instance(), $func), 
+                  array(R76_base::instance(), $func),
                   $args
-              ); 
-    } 
+              );
+    }
 
 }
 
