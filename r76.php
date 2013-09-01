@@ -18,22 +18,40 @@ final class R76_base
     {
         if (count($_GET)) {
 
-            header('location://'.trim(strstr($_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'], '?', true), '/').'/'.strtr(http_build_query($_GET), '=&', ':/')); exit;
+            // Find current URL without queries params
+            header('location://'.trim(strstr($_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'], '?', true), '/').'/'.strtr(http_build_query($_GET), '=&', ':/')); 
+
+            // die(); Is better.
+            exit;
         }
 
+        // Find root URL for the site
         $this->root = '//'.trim($_SERVER['HTTP_HOST'].dirname($_SERVER['PHP_SELF']), '/').'/';
 
+        // Find URI based on the full URL. Built a fragment URL
+        // Usefull for blog/article/@title etc.
         $uri = explode('/', trim(substr('//'.$_SERVER['HTTP_HOST'].$_SERVER["REQUEST_URI"], strlen($this->root)), '/'));
 
+        // Build $_GET from custom query rules
         foreach ($uri as $chunk) {
 
             if (strpos($chunk, ':') !== false) {
-
                 list ($k, $v) = explode(':', $chunk);
                 $_GET[$k] = trim(urldecode($v));
             }
         }
 
+        /**
+         * 
+         * $uri est un tableau, car je l'ai explode précédemment, je vire donc les paramètres GET
+         * $URIwithoutGETparams = array_slice($uri, 0, count($uri)-count($_GET));
+         * // j'en refais une chaîne pour mon preg_replace
+         * $URIwithoutGETparams = implode('/', $URIwithoutGETparams); 
+         * // je vire l'extension, comme ça le routeur interprète "site.com/sitemap" et "site.com/sitemap.xml" comme la même URL
+         * $extensionFreeURI = preg_replace('/\.[a-z]+$/i', '', $URIwithoutGETparams);
+         * // j'injecte dans $this->path sous forme de fragments (un "/sous-dossier/" = un fragment
+         * $this->path = explode('/', $extensionFreeURI);
+         */
         $this->path = explode('/', preg_replace('/\.[a-z]+$/i', '', implode('/', array_slice($uri, 0, count($uri)-count($_GET)))));
 
         return ob_start();
