@@ -1,46 +1,12 @@
 <?php
 /**
- * # R76 by Nicolas Torres (76.io)
+ * R76 by Nicolas Torres (76.io)
  * light-weight and powerful PHP router
  * CC BY-SA license: creativecommons.org/licenses/by-sa/3.0
  */
-final class R76_base {
-
-    /**
-     * [$instance description]
-     * @var [type]
-     */
-    private static $instance;
-
-    /**
-     * [$root description]
-     * @var [type]
-     */
-    private $root;
-
-    /**
-     * [$path description]
-     * @var array
-     */
-    private $path     = array();
-
-    /**
-     * [$callback description]
-     * @var boolean
-     */
-    private $callback = false;
-
-    /**
-     * Build a new instance of R76_base
-     * @return R76_base 
-     */
-    public static function instance() { 
-
-        if(!self::$instance) self::$instance = new self(); 
-        return self::$instance; 
-    }
-
-    private function __clone() {}
+final class R76_base
+{
+    private static $instance; private $root, $path = array(), $callback = false;
 
     /**
      * Parse URI and params & rewrite GET params
@@ -48,120 +14,63 @@ final class R76_base {
      *     (e.g. URI?search=terms&page=2 => URI/search:terms/page:2)
      * @return   [description]
      */
-    public function __construct() {
+    public function __construct()
+    {
+        if (count($_GET)) {
 
-        if (count($_GET)) { 
-            // Dafuq ?
-            $base_url = trim(strstr($_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'], '?', true), '/');
-            $query    = strtr(http_build_query($_GET), '=&', ':/');
-            header('location://'.$base_url.'/'.$query);
-            exit; 
+            header('location://'.trim(strstr($_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'], '?', true), '/').'/'.strtr(http_build_query($_GET), '=&', ':/')); exit; 
         }
 
-        // Dafuq ?
         $this->root = '//'.trim($_SERVER['HTTP_HOST'].dirname($_SERVER['PHP_SELF']), '/').'/';
 
-        // Dafuq ?
         $uri = explode('/', trim(substr('//'.$_SERVER['HTTP_HOST'].$_SERVER["REQUEST_URI"], strlen($this->root)), '/'));
 
-        // Dafuq ?
-        foreach ($uri as $p) {
+        foreach ($uri as $chunk) {
 
-            // Ok it seems to be $_GET from request
-            if (strpos($p, ':') !== false) { 
-                list ($k, $v) = explode(':', $p); 
+            if (strpos($chunk, ':') !== false) { 
+
+                list ($k, $v) = explode(':', $chunk); 
                 $_GET[$k] = trim(urldecode($v)); 
             }
         }
 
-        // Dafuq ?
         $this->path = explode('/', preg_replace('/\.[a-z]+$/i', '', implode('/', array_slice($uri, 0, count($uri)-count($_GET)))));
 
         return ob_start();
     }
 
-    /**
-     * Perform config from file
-     * @param  String $cmd File configuration for your routes
-     */
-    public function config($cmd) {
+    # Get URL components
+    public function root() { return $this->root; }
 
-        if (is_file($cmd)) {
-          return array_map(__METHOD__, preg_split('/\v/m', file_get_contents($cmd)));
-        }
-
-        if (!is_string($cmd)) {
-            throw new Exception('Config — Command should be a string');
-        }
-
-        // Dafuq ?
-        $param = preg_split('/\h+/', trim($cmd));
-
-        // Dafuq ?
-        if ($param[0]{0} == '#' OR empty($param[0])) return;
-
-        // Dafuq ?
-        switch (strtolower(array_shift($param))) {
-
-            case 'route': 
-                $this->route($param[0], $param[1], $param[2]);
-                break;
-            case 'call': 
-                if (!$this->call(array_shift($param), $param)) {
-                    throw new Exception('Call - Wrong syntax or callback: '.$cmd);
-                }
-                break;
-            default: 
-                throw new Exception('Config - Unknown command: '.$cmd); 
-                break;
-        }
-    }
-
-    /**
-     * Get URL components
-     * @return [type] [description]
-     */
-    public function root() { 
-        return $this->root; 
-    }
-
-    /**
-     * Get URL params ?
-     * @return Array
-     */
     public function uri() { 
-        return implode('/', $this->path);
+        return implode('/', $this->path); 
+    }
+
+    public function path($k) { 
+
+        $p = is_int($k) ? array_values($this->path) : $this->path; 
+        return $p[$k]; 
     }
 
     /**
-     * [path description]
-     * @param  [type] $k [description]
-     * @return [type]    [description]
-     */
-    public function path($k) {
-        return $this->path[$k];
-    }
-    
-    /**
-     * Get URL: 
+     * Get URL:
      *     (void, void) -> current URL,
-     *     (arr, void) -> current URL + updated params, 
+     *     (arr, void) -> current URL + updated params,
      *     (str, arr) -> new URL + new params
      * @param  boolean $uri    [description]
      * @param  array   $params [description]
      * @return [type]          [description]
      */
-    public function url($uri = false, $params = array()) {
-
-      if (is_array($uri)) {
-        $params = array_replace($_GET, $uri);
-
+    public function url($uri = false, $params = array())
+    {
+    
+        if (is_array($uri)) {
+            $params = array_replace($_GET, $uri);
         }elseif ($uri === false) {
             $params = $_GET;
         }
-
-        // Dafuq ?
-        return $this->root.(($uri !== false AND !is_array($uri)) ? trim($uri, "/ \t\n\r\0\x0B") : $this->uri()).(count($params) ? '/'.strtr(http_build_query($params), '=&', ':/') : '');
+    
+        return $this->root.(($uri !== false AND !is_array($uri))?trim($uri, "/ \t\n\r\0\x0B"):$this->uri()).(count($params)?'/'.strtr(http_build_query($params), '=&', ':/'):'');
     }
 
     /**
@@ -169,9 +78,9 @@ final class R76_base {
      * @param  boolean $default [description]
      * @return [type]           [description]
      */
-    public function run($default = false) {
-
-        if (!$this->call($this->callback) AND !$this->call($default)) {
+    public function run($default = false)
+    {
+        if ( !$this->call($this->callback) AND !$this->call($default) ) {
           throw new Exception('Run - Unknown callback: '.$this->callback.' or default: '.$default);
         }
 
@@ -191,85 +100,124 @@ final class R76_base {
      * @param  function $callback [description]
      * @return [type]           [description]
      */
-    public function route($verb, $route, $callback) {
+    public function route($verb, $route, $callback)
+    {
+        if ($this->callback) return true;
 
-        if ($this->callback) return;
-
-        if (!is_string($route = trim($route, '/')) OR !is_string($verb)) {
+        if ( !is_string($route = trim($route, '/')) OR !is_string($verb) ) {
             throw new Exception('Route — First two parameters should be strings.');
         }
 
-        // Dafuq ? Is this magic ?
         if (preg_match('/^(?:'.strtolower($verb).') '.preg_replace('/@[a-z0-9_]+/i', '([a-z0-9_-]+)', preg_quote($route, '/')).'$/i', strtolower($_SERVER['REQUEST_METHOD']).' '.$this->uri(), $m)) {
+
             $tmp = $this->path = array_combine(explode('/', str_replace('@', '', $route)), $this->path);
 
-            if(!is_string($callback)) {
-                $this->callback = $callback;
-            }else {
-                // Dafuq ? What is that ?
-                $this->callback = preg_replace_callback('/@([a-z0-9_]+)/i', function($m) use ($tmp) {
-                    return $tmp[$m[1]]; 
-                }, trim($callback, '/'));
-            }
-        }
+            $this->callback = !is_string($callback) ? $callback : preg_replace_callback('/@([a-z0-9_]+)/i', function($m) use ($tmp) { return $tmp[$m[1]]; }, trim($callback, '/'));
+        } 
+        return true;
     }
-    
-  # Wrappers: get, post, put, delete
+
+     /**
+     * Wrappers for GET|POST|PUT|DELETE
+     * @param  String $func  Type of request
+     * @param  Array $args
+     */
+    public function __call($func, $args)
+    {
+        if ( !in_array($func, explode(',', 'get,put,post,delete')) ) {
+
+            throw new Exception('R76 — Invalid method: '.$func);
+        }
+
+        $this->route($func, $args[0], $args[1]);
+    }
 
     /**
-     * Wrappers for GET|POST|PUT|DELETE
-     * @param  [type] $f    [description]
-     * @param  [type] $args [description]
-     * @return [type]       [description]
+     * Perform config from file
+     * @param  String file File configuration for your routes
      */
-    public function __call($f, $args) { 
-
-        if (!in_array($f, explode(',', 'get,put,post,delete'))) {
-            throw new Exception('R76 — Invalid method: '.$f);
+    public function config($file)
+    {
+        if (!is_file($file)) {
+            throw new Exception('Config — Invalid file: '.$file);
         }
 
-        $this->route($f, $args[0], $args[1]);
+        $trims = array_map('trim', preg_split('/\v/m', file_get_contents($file)));
+
+        foreach ($trims as $cmd) {
+
+            if ($cmd{0} == '#' OR empty($cmd)) continue;
+
+            $param = preg_split('/\h+/', $cmd);
+
+            if ( !call_user_func_array(array($this, strtolower(array_shift($param))), $param) ) {
+                throw new Exception('Config - Unknown command: '.$cmd);
+            }
+        }
     }
 
     /**
      * Call user file|function|method
-     * @param  [type]  $f    [description]
-     * @param  boolean $args [description]
-     * @return [type]        [description]
+     * @return boolean
      */
-    private function call($f, $args = false) {
+    private function call()
+    {
+        $args = func_get_args();
 
-        if (is_callable($f)) {
-            call_user_func_array($f, (array)$args);
-        } elseif (is_file((string)$f)) {
-            include $f;
+        if ( is_callable($func = array_shift($args)) ) {
 
-        // Dafuq ?
-        } elseif (preg_match('/(.+)->(.+)/', (string)$f, $m) AND is_callable($f = array(new $m[1], $m[2]))) {
-            call_user_func_array($f, (array)$args);
-        } else {
-            return false;
+            call_user_func_array($func, (array)$args);
         }
+        elseif (is_file((string)$func)) {
+
+            include $func;
+        }
+        elseif ( preg_match('/(.+)->(.+)/', (string)$func, $m) AND is_callable($func = array(new $m[1], $m[2])) ) {
+
+            call_user_func_array($func, (array)$args);
+        }
+        else {
+            return false;
+        } 
 
         return true;
     }
-} 
-  
-/**
- * Singleton pattern & return instance
- */
-class R76 { 
 
+    /**
+     * Singleton pattern
+     * @return R76_base
+     */
+    public static function instance() { 
+
+        if(!self::$instance) {
+            self::$instance = new self(); 
+        }
+
+        return self::$instance;
+    }
+
+    private function __clone() {}
+}
+
+/**
+ * R76 Static call class & return instance
+ */
+class R76
+{
     /**
      * [__callstatic description]
      * @param  [type] $f    [description]
      * @param  array  $args [description]
      * @return [type]       [description]
      */
-    public static function __callstatic($f, array $args) { 
+    public static function __callstatic($func, array $args) { 
 
-        return call_user_func_array(array(R76_base::instance(), $f), $args); 
+        return call_user_func_array(
+                  array(R76_base::instance(), $func), 
+                  $args
+              ); 
     } 
+
 }
 
 return R76_base::instance();

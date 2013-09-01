@@ -99,7 +99,7 @@ Name this file however you want, and call it using:
 	
 	$site->config('path/to/the/config');
 
-To prevent from the frustration of having some extra PHP code lines out of the config file, it enables a CALL commands. This is the syntax:
+To prevent from the frustration of having some extra PHP code lines out of the config file, it enables a CALL command. This is the syntax:
 
 	CALL callback parameters
 	
@@ -109,6 +109,10 @@ It could be useful to define constants, load PHP files (with the [load helper](#
 
 	CALL load site/core
 	CALL define key value
+	
+Finally, you could call the RUN method right in the file too:
+
+	RUN callback
 
 
 # Tips
@@ -146,7 +150,17 @@ You can simply call before and after route callbacks by using this trick:
 	// anything below will be executed after the route callback
 	afterRoute();
 	
-Note that in a configuration file, any CALL command will be executed before the route callback.
+And in a configuration file:
+
+	# configuration…
+	
+	CALL beforeRoute
+	# anything above run will be executed before the route callback
+	
+	RUN error
+	
+	# anything below will be executed after the route callback
+	CALL afterRoute
 
 # Helpers and R76 public methods
 Some values and functions are avaiable to manipulate anything related to URLs and template files. Those functions are avaible in all your files.
