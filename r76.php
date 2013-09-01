@@ -19,7 +19,7 @@ final class R76_base
         if (count($_GET)) {
 
             // Find current URL without queries params
-            header('location://'.trim(strstr($_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'], '?', true), '/').'/'.strtr(http_build_query($_GET), '=&', ':/')); 
+            header('location://'.trim(strstr($_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'], '?', true), '/').'/'.strtr(http_build_query($_GET), '=&', ':/'));
 
             // die(); Is better.
             exit;
@@ -42,11 +42,11 @@ final class R76_base
         }
 
         /**
-         * 
+         *
          * $uri est un tableau, car je l'ai explode précédemment, je vire donc les paramètres GET
          * $URIwithoutGETparams = array_slice($uri, 0, count($uri)-count($_GET));
          * // j'en refais une chaîne pour mon preg_replace
-         * $URIwithoutGETparams = implode('/', $URIwithoutGETparams); 
+         * $URIwithoutGETparams = implode('/', $URIwithoutGETparams);
          * // je vire l'extension, comme ça le routeur interprète "site.com/sitemap" et "site.com/sitemap.xml" comme la même URL
          * $extensionFreeURI = preg_replace('/\.[a-z]+$/i', '', $URIwithoutGETparams);
          * // j'injecte dans $this->path sous forme de fragments (un "/sous-dossier/" = un fragment
