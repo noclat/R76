@@ -129,6 +129,8 @@ The URLs could be written both **with or without any extension**. `//example.com
 ## Callbacks
 Callbacks could be files, anonymous functions, and function or method names. If it’s a file, it will just be included (and executed). If it’s a function or a method name, just pass the name, without the parenthesis. Examples: `load`, `articles::read`, `article->read` — in this last case, the ‘article’ class will be instanciated and the `__construct()` method will be triggered.
 
+**Note**: use `return false;` in a callback to cancel it and trigger the default callback instead.
+
 **Warning**: callbacks in a configuration file can not be anonymous functions since it's a string.
 
 ## GET parameters

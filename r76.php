@@ -17,7 +17,7 @@
     public function root() { return $this->root; }
     public function uri() { return implode('/', $this->path); }
     public function path($k) { $p = is_int($k)?array_values($this->path):$this->path; return $p[$k]; }
-    
+
   # Get URL: (void, void) -> current URL, (arr, void) -> current URL + updated params, (str, arr) -> new URL + new params
     public function url($uri = false, $params = array()) {
       if (is_array($uri)) $params = array_replace($_GET, $uri);
@@ -40,7 +40,7 @@
         $this->callback = !is_string($callback) ? $callback : preg_replace_callback('/@([a-z0-9_]+)/i', function($m) use ($tmp) { return $tmp[$m[1]]; }, trim($callback, '/'));
       } return true;
     }
-    
+
   # Wrappers: get, post, put, delete
     public function __call($func, $args) { 
       if (!in_array($func, explode(',', 'get,put,post,delete'))) throw new Exception('R76 — Invalid method: '.$func);
@@ -60,17 +60,17 @@
   # Call user file|function|method
     private function call() {
       $args = func_get_args();
-      if (is_callable($func = array_shift($args))) call_user_func_array($func, (array)$args);
-      elseif (is_file((string)$func)) include $func;
-      elseif (preg_match('/(.+)->(.+)/', (string)$func, $m) AND is_callable($func = array(new $m[1], $m[2]))) call_user_func_array($func, (array)$args);
-      else return false; return true;
+      if (is_callable($func = array_shift($args))) $ok = call_user_func_array($func, (array)$args);
+      elseif (is_file((string)$func)) $ok = include $func;
+      elseif (preg_match('/(.+)->(.+)/', (string)$func, $m) AND is_callable($func = array(new $m[1], $m[2]))) $ok = call_user_func_array($func, (array)$args);
+      else return false; return $ok !== false;
     }
-    
+
   # Singleton pattern
     public static function instance() { if(!self::$instance) self::$instance = new self(); return self::$instance; }
     private function __clone() {}
   } 
-  
+
 # R76 Static call class & return instance
   class R76 { public static function __callstatic($func, array $args) { return call_user_func_array(array(R76_base::instance(), $func), $args); } }
   return R76_base::instance();
