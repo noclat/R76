@@ -203,14 +203,14 @@ If `$key` is numeric, it returns the nth part (zero-based) of the URI.
   
 <a name="param-helper"/>
 ### param($key)
-Return the value of the GET parameter `$key`. It's the same than $_GET[$key].
+Returns the value of the GET parameter `$key`. It's the same than $_GET[$key].
 
 	// current url: articles/tag:webdesign
 	echo param(‘tag’); // will return ‘webdesign’
 	
 <a name="params-helper"/>
 ### params()
-Return an associative array of the GET parameters, strickly the same as `$_GET` values.
+Returns an associative array of the GET parameters, strickly the same as `$_GET` values.
 
 <a name="verb-helper"/>
 ### verb()
@@ -226,4 +226,4 @@ Loads all the php files located in the given folder path.
 
 <a name="go-helper"/>
 ### go($location)
-Redirect to the specified url. If `$location` parameter is ommited, it will refresh the current page, using `url()` value.
+Redirects to the specified url. If `$location` parameter is ommited, it will refresh the current page, using `url()` value.
