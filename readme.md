@@ -1,5 +1,5 @@
 # R76 router
-R76 is a light-weight and lightning fast PHP router that can hold any kind of project. It's xtended with some configuration features to help the code organization. R76 does not require any design pattern.
+R76 is a light-weight and lightning fast PHP router that can hold any kind of project. It's extended with some configuration features to help the code organization. R76 does not require any design pattern.
 
 R76 is shared under a [CC BY-SA license](http://creativecommons.org/licenses/by-sa/3.0). 
 
