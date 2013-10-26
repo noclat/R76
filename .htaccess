@@ -1,12 +1,10 @@
 <IfModule mod_rewrite.c>
-# URL-Rewriting
-  RewriteEngine on 
+  RewriteEngine on
+  
+  # RewriteRule ^path/to/protected/directory/(.*) error [R=301,L]
 
-# Deny access to the included PHP files: router, helpers, templates and so on (I usually put them in site/).
-  RewriteRule ^site/(.*) error [R=301,L]
-
-# Rewrite any request to index
+# Rewrite any request to index.php
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteRule ^.*  index.php  [L]
+  RewriteRule ^.* index.php [L]
 </IfModule>

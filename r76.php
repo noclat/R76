@@ -1,5 +1,5 @@
 <?php
-# R76 by Nicolas Torres (76.io), CC BY-SA license: creativecommons.org/licenses/by-sa/3.0
+# R76 by Nicolas Torres (ntorres.me), CC BY-SA license: creativecommons.org/licenses/by-sa/3.0
   final class R76_base {
     private static $instance; private $root, $path = array(), $callback = false;
 
