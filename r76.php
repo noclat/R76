@@ -61,7 +61,7 @@
     private function call() {
       $args = func_get_args();
       if (is_callable($func = array_shift($args))) $abort = call_user_func_array($func, (array)$args);
-      elseif (is_file((string)$func)) $ok = include $func;
+      elseif (is_file((string)$func)) $abort = include $func;
       elseif (preg_match('/(.+)->(.+)/', (string)$func, $m) AND is_callable($func = array(new $m[1], $m[2]))) $abort = call_user_func_array($func, (array)$args);
       else return false; return $abort !== false;
     }
