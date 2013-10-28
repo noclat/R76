@@ -20,7 +20,7 @@ Special thanks to [dhoko](http://github.com/dhoko) for his feedbacks.
 - [Helpers and R76 public methods](#helpers-and-r76-public-methods)
 	- [root() or R76::root()](#root-helper)
 	- [url( …? ) or R76::url( …? )](#url-helper)
-	- [uri( $key? ) or R76::uri() and R76::param( $key )](#uri-helper)
+	- [uri( $key? ) or R76::uri( $key? )](#uri-helper)
 	- [get( $key? ) or $_GET](#get-helper)
 	- [verb()](#verb-helper)
 	- [async()](#async-helper)
@@ -183,7 +183,7 @@ Returns the absolute url, adding the parameters.
 will return `//yourdomain.com/article/read/4/showcomments:true/commentspage:1`.
 
 <a name="uri-helper"/>
-### uri( $key? ) or R76::uri() and R76::param( $key )
+### uri( $key? ) or R76::uri( $key? )
 #### 0 parameter
 Returns the current URI, which is the URL freed from root and GET parameters.
 
