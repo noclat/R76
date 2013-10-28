@@ -19,15 +19,13 @@ Special thanks to [dhoko](http://github.com/dhoko) for his feedbacks.
 	- [Before and after route callbacks](#before-and-after-route-callbacks)
 - [Helpers and R76 public methods](#helpers-and-r76-public-methods)
 	- [root() or R76::root()](#root-helper)
-	- [url() or R76::url()](#url-helper)
-	- [uri() or R76::uri()](#uri-helper)
-	- [path() or R76::path()](#path-helper)
-	- [param() or R76::param()](#param-helper)
-	- [params() or R76::params()](#params-helper)
+	- [url( …? ) or R76::url( …? )](#url-helper)
+	- [uri( $key? ) or R76::uri() and R76::param( $key )](#uri-helper)
+	- [get( $key? ) or $_GET](#get-helper)
 	- [verb()](#verb-helper)
 	- [async()](#async-helper)
-	- [load()](#load-helper)
-	- [go()](#go-helper)
+	- [load( $path )](#load-helper)
+	- [go( $url? )](#go-helper)
 
 ## Getting started
 Include the `r76.php` and `helpers.php` files. Start creating an `index.php` file at the top level.
@@ -158,7 +156,7 @@ Some values and functions are avaiable to manipulate anything related to URLs an
 Returns the complete adress of your website.
 
 <a name="url-helper"/>
-### url() or R76::url() 
+### url( …? ) or R76::url( …? ) 
 #### 0 parameter
 Returns the complete current url.
 
@@ -185,32 +183,32 @@ Returns the absolute url, adding the parameters.
 will return `//yourdomain.com/article/read/4/showcomments:true/commentspage:1`.
 
 <a name="uri-helper"/>
-### uri() or R76::uri()
+### uri( $key? ) or R76::uri() and R76::param( $key )
+#### 0 parameter
 Returns the current URI, which is the URL freed from root and GET parameters.
 
-<a name="path-helper"/>
-### path($key) or R76::path($key)
+#### 1 parameter
 If `$key` is a string, it returns the value of the variable set in the root:
 
 	// config: ROUTE GET articles/read/@id/ article->read
 	// current uri: articles/read/134/
-	echo path(‘id’); // will return ‘134’
+	echo uri(‘id’); // will return ‘134’
 
 If `$key` is numeric, it returns the nth part (zero-based) of the URI.
 
 	// current uri: articles/read/134/
-	echo path(2); // will return ‘134’
-  
-<a name="param-helper"/>
-### param($key)
+	echo uri(2); // will return ‘134’
+
+<a name="get-helper"/>
+### get( $key? ) or $_GET
+#### 0 parameter
+Returns an associative array of the GET parameters, strickly the same as `$_GET` values.
+
+#### 1 parameter
 Returns the value of the GET parameter `$key`. It's the same than $_GET[$key].
 
 	// current url: articles/tag:webdesign
-	echo param(‘tag’); // will return ‘webdesign’
-	
-<a name="params-helper"/>
-### params()
-Returns an associative array of the GET parameters, strickly the same as `$_GET` values.
+	echo get(‘tag’); // will return ‘webdesign’
 
 <a name="verb-helper"/>
 ### verb()
@@ -221,9 +219,9 @@ Returns the current verb (GET, POST, PUT, DELETE). Note: it returns the value of
 Returns true if you’re using an AJAX request, and false if not. What defines an AJAX request is the value of the `X_REQUESTED_WITH` header set to `XMLHttpRequest`, used in nearly all of the JavaScript libraries that send AJAX requests.
 
 <a name="load-helper"/>
-### load($path)
+### load( $path )
 Loads all the php files located in the given folder path.
 
 <a name="go-helper"/>
-### go($location)
-Redirects to the specified url. If `$location` parameter is ommited, it will refresh the current page, using `url()` value.
+### go( $url? )
+Redirects to the specified url. If `$url` parameter is ommited, it will refresh the current page, using `url()` value.
