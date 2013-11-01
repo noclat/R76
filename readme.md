@@ -83,7 +83,7 @@ Anything above `run()` will be executed before the route callback, and anything 
 Some values and functions are avaiable to manipulate anything related to URLs and template files. Those functions are avaible in all your files.
 
 <a name="root-helper"/>
-### root() or R76::root()
+### root()
 Returns the complete adress of your website.
 
 <a name="url-helper"/>
