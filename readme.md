@@ -11,7 +11,7 @@ Special thanks to [dhoko](http://github.com/dhoko) for his feedbacks.
 - [Getting started](#getting-started)
 - [Routes](#routes)
 - [Tips](#tips)
-	- [Syntax sensibility](#syntax-sensibility)
+	- [Paths](#paths)
 	- [Callbacks](#callbacks)
 	- [GET parameters](#get-parameters)
 	- [Before and after route callbacks](#before-and-after-route-callbacks)
@@ -61,7 +61,7 @@ You can also configure routes by using the wrappers:
 	delete('/route/path', $callback);
 	
 ## Tips
-### Syntax sensibility
+### Paths
 Any path you will have to write (in `url()` helper and the configuration methods) are parsed to prevent from any bug occuring with the ‘slash’ character confusing use. So you can both write `/path/` or `path/`, and even `path`.  
 
 **Note:** the URLs could be written both **with or without any extension**—`//example.com/sitemap` and `//example.com/sitemap.xml` would be equaly regarded. Make sure the extension doesn't appear in routing functions.
@@ -87,7 +87,7 @@ Some values and functions are avaiable to manipulate anything related to URLs an
 Returns the complete adress of your website.
 
 <a name="url-helper"/>
-### url( …? ) or R76::url( …? ) 
+### url( …? ) 
 #### 0 parameter
 Returns the complete current url.
 
@@ -114,7 +114,7 @@ Returns the absolute url, adding the parameters.
 will return `//yourdomain.com/article/read/4/showcomments:true/commentspage:1`.
 
 <a name="uri-helper"/>
-### uri( $key? ) or R76::uri( $key? )
+### uri( $key? )
 #### 0 parameter
 Returns the current URI, which is the URL freed from root and GET parameters.
 
