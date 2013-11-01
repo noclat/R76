@@ -48,8 +48,8 @@ The `run()` function displays the result, and gets a callback in parameter, call
 After including `r76.php`, and before calling `run()` that will display your page, you may need to configure routes callback:
 
 	on('GET', '/', function() { … });
-	on('GET|POST', '/@section', function($section) { … }); // $section is a paramater
-	on('*', '/form', function() { … }); // * = GET|POST|PUT|DELETE
+	on('GET', '/@section', function($section) { … }); // $section is a paramater
+	on('GET|POST|PUT|DELETE', '/form', function() { … });
 
 The **URL** respects the [path syntax](#syntax-sensibility). Anyway, to match the root, you’ll need to set the URL as ‘/’. Note that [GET parameters](#get-parameters) aren’t part of the route. 
 	
