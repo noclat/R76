@@ -51,7 +51,7 @@ After including `r76.php`, and before calling `run()` that will display your pag
 	on('GET', '/@section', function($section) { … }); // $section is a paramater
 	on('GET|POST|PUT|DELETE', '/form', function() { … });
 
-The **URL** respects the [path syntax](#syntax-sensibility). Anyway, to match the root, you’ll need to set the URL as ‘/’. Note that [GET parameters](#get-parameters) aren’t part of the route. 
+The **URL** respects the [path syntax](#paths). Anyway, to match the root, you’ll need to set the URL as ‘/’. Note that [GET parameters](#get-parameters) aren’t part of the route. 
 	
 You can also configure routes by using the wrappers:
 
@@ -89,22 +89,22 @@ Returns the complete adress of your website.
 <a name="url-helper"/>
 ### url( …? ) 
 #### 0 parameter
-Returns the complete current url.
+Returns the complete current URL.
 
 #### 1 string parameter
-Returns the absolute protocle-free url of a relative path. `url(‘articles/archives’)` will return `//yourdomain.com/articles/archives`. This works both for http and https urls.
+Returns the absolute protocol-free URL of a relative path. `url(‘articles/archives’)` will return `//yourdomain.com/articles/archives`. This works both for http and https URLs.
 
 #### 1 associative array parameter
-Returns the same url, but changes the specified parameters. Example: the current URL is `article/read/4/showcomments:true/commentspage:3`.
+Returns the same URL, but changes the specified parameters. Example: the current URL is `article/read/4/showcomments:true/commentspage:3`.
 
 	echo url(array(
 		‘commentspage’ => 5
 	));
 
-will return the absolute url of `article/read/4/showcomments:true/commentspage:5`.
+will return the absolute URL of `article/read/4/showcomments:true/commentspage:5`.
 
 #### 1 string + 1 associative array parameters
-Returns the absolute url, adding the parameters.
+Returns the absolute URL, adding the parameters.
 
 	echo url(‘article/read/4’, array(
 		‘showcomments’ => ‘true’
@@ -121,14 +121,18 @@ Returns the current URI, which is the URL freed from root and GET parameters.
 #### 1 parameter
 If `$key` is a string, it returns the value of the variable set in the root:
 
-	// config: ROUTE GET articles/read/@id/ article->read
-	// current uri: articles/read/134/
-	echo uri(‘id’); // will return ‘134’
+	// current URL: //yoursite.com/articles/read/134/
+	get('articles/read/@id', function($id) {
+		echo $id; // displays “134”
+		echo uri('id'); // displays “134”
+	});
 
 If `$key` is numeric, it returns the nth part (zero-based) of the URI.
 
 	// current uri: articles/read/134/
-	echo uri(2); // will return ‘134’
+	echo uri(0); // displays “articles”
+	echo uri(1); // displays “read”
+	echo uri(2); // displays “134”
 
 <a name="verb-helper"/>
 ### verb()
@@ -144,4 +148,4 @@ Loads all the php files located in the given folder path.
 
 <a name="go-helper"/>
 ### go( $url? )
-Redirects to the specified url. If `$url` parameter is ommited, it will refresh the current page, using `url()` value.
+Redirects to the specified URL. If `$url` parameter is ommited, it will refresh the current page, using `url()` value.
