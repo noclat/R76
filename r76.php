@@ -60,15 +60,15 @@
   }
 
 # Helpers
-  function root() { return R76::root(); }
-  function url($uri = false, $params = array()) { return R76::url($uri, $params); }
-  function uri($k = false) { return R76::uri($k); }
   function on($verb, $route, $callback) { R76::on($verb, $route, $callback); }
   function get($route, $callback) { R76::get($route, $callback); }
   function post($route, $callback) { R76::post($route, $callback); }
   function put($route, $callback) { R76::put($route, $callback); }
   function delete($route, $callback) { R76::delete($route, $callback); }
   function run($callback = false) { R76::run($callback); }
+  function root() { return R76::root(); }
+  function url($uri = false, $params = array()) { return R76::url($uri, $params); }
+  function uri($k = false) { return R76::uri($k); }
   function verb() { return $_SERVER['REQUEST_METHOD']; }
   function async() { return strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'; }
   function load($path) { foreach (glob(trim($path, '/').'/*.php') as $file) include_once $file; }
