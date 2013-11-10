@@ -26,10 +26,7 @@
       elseif ($uri === false) $get = $_GET;
       return $this->root.(($uri !== false AND !is_array($uri))?trim($uri, "/ \t\n\r\0\x0B"):$this->uri()).(count($get)?'/'.strtr(http_build_query($get), '=&', ':/'):'');
     }
-
-  # Call the callback file|function|method
-    public function run($default = false) { return $this->call(array_shift($this->callback), $this->callback) OR $this->call($default); }
-
+    
   # Match route (e.g. GET|POST|PUT|DELETE, /path/with/@var, path/to/file.ext|func()|class->method()). Note: you can use '@var' in callbacks name.
     public function on($verb, $route, $callback) {
       if ($this->callback) return;
@@ -40,11 +37,8 @@
       }
     }
 
-  # Wrappers: get, post, put, delete
-    public function __call($func, $args) { 
-      if (!in_array($func, explode(',', 'get,put,post,delete'))) throw new Exception('R76 - Invalid method: '.$func);
-      $this->on($func, $args[0], $args[1]);
-    }
+  # Call the callback file|function|method
+    public function run($default = false) { return $this->call(array_shift($this->callback), $this->callback) OR $this->call($default); }
 
   # Call user file|function|method
     private function call($func, $args = array()) {
@@ -61,10 +55,10 @@
 
 # Helpers
   function on($verb, $route, $callback) { R76::on($verb, $route, $callback); }
-  function get($route, $callback) { R76::get($route, $callback); }
-  function post($route, $callback) { R76::post($route, $callback); }
-  function put($route, $callback) { R76::put($route, $callback); }
-  function delete($route, $callback) { R76::delete($route, $callback); }
+  function get($route, $callback) { R76::on('get', $route, $callback); }
+  function post($route, $callback) { R76::on('post', $route, $callback); }
+  function put($route, $callback) { R76::on('put', $route, $callback); }
+  function delete($route, $callback) { R76::on('delete', $route, $callback); }
   function run($callback = false) { R76::run($callback); }
   function root() { return R76::root(); }
   function url($uri = false, $params = array()) { return R76::url($uri, $params); }
