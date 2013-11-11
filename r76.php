@@ -42,9 +42,9 @@
 
   # Call user file|function|method
     private function call($func, $args = array()) {
-      if (is_callable($func)) $abort = call_user_func_array($func, $args);
+      if (is_callable($func)) $abort = call_user_func_array($func, (array)$args);
       elseif (is_file((string)$func)) $abort = include $func;
-      elseif (preg_match('/(.+)->(.+)/', (string)$func, $m) AND is_callable($func = array(new $m[1], $m[2]))) $abort = call_user_func_array($func, $args);
+      elseif (preg_match('/(.+)->(.+)/', (string)$func, $m) AND is_callable($func = array(new $m[1], $m[2]))) $abort = call_user_func_array($func, (array)$args);
       else return false; return $abort !== false;
     }
 
