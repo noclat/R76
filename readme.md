@@ -27,7 +27,7 @@ Special thanks to [dhoko](http://github.com/dhoko) for his feedbacks.
 ## Getting started
 Start creating an `index.php` file at the top level. Include `r76.php`.
 
-The `index.php` needs to load the system. Here is an example of what it should looks like:
+All requests are redirected to `index.php`. Here is an example of what it should looks like:
 
 	<?php
 	include 'r76.php';
@@ -36,10 +36,14 @@ The `index.php` needs to load the system. Here is an example of what it should l
 		echo 'Home page.';
 	});
 	
+	get('/about', function() {
+		echo 'About page.';
+	});
+	
 	// other routes here
 	
 	run(function() { 
-		echo('No route matched.'); 
+		echo 'No route matched.'; 
 	});
 
 The `run()` function displays the result, and gets a callback in parameter, called when the URL doesn’t match any route configuration. See the [Callbacks section](#callbacks) below to know more about what is posssible to do with.
@@ -144,7 +148,7 @@ Returns true if you’re using an AJAX request, and false if not. What defines a
 
 <a name="load-helper"/>
 ### load( $path )
-Loads all the php files located in the given folder path.
+Includes all the php files located in the given folder path.
 
 <a name="go-helper"/>
 ### go( $url? )
