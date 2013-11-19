@@ -10,6 +10,8 @@ Special thanks to [dhoko](http://github.com/dhoko) for his feedbacks.
 # Documentation
 - [Getting started](#getting-started)
 - [Routes](#routes)
+	- [Wrappers](#wrappers)
+	- [Parameters](#parameters)
 - [Tips](#tips)
 	- [Paths](#paths)
 	- [Callbacks](#callbacks)
@@ -52,17 +54,32 @@ The `run()` function displays the result, and gets a callback in parameter, call
 After including `r76.php`, and before calling `run()` that will display your page, you may need to configure routes callback:
 
 	on('GET', '/', function() { … });
-	on('GET', '/@section', function($section) { … }); // $section is a paramater
+	on('GET', '/@section', function( $section ) { … }); // $section is a paramater
 	on('GET|POST|PUT|DELETE', '/form', function() { … });
 
 The **URL** respects the [path syntax](#paths). Anyway, to match the root, you’ll need to set the URL as ‘/’. Note that [GET parameters](#get-parameters) aren’t part of the route. 
 	
+### Wrappers
 You can also configure routes by using the wrappers:
 
 	get('/route/path', $callback);
 	post('/route/path', $callback);
 	put('/route/path', $callback);
 	delete('/route/path', $callback);
+	
+### Parameters
+
+URL parameters are passed to the callback function in the order they are specified.
+
+	// current URL: //yoursite.com/projects/articles/134/
+	get('@category/articles/@id', function( $category, $id ) {
+		echo $category; // displays "projects"
+		echo $id; // displays “134”
+		echo uri('id'); // displays “134”
+	});
+	
+See [URI helper](#uri-helpers) for more information about `uri()` function.
+
 	
 ## Tips
 ### Paths
