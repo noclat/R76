@@ -55,9 +55,10 @@ After including `r76.php`, and before calling `run()` that will display your pag
 
 	on('GET', '/', function() { … });
 	on('GET', '/@section', function( $section ) { … }); // $section is a paramater
-	on('GET|POST|PUT|DELETE', '/form', function() { … });
+	on('GET|POST|PUT|DELETE', '/form', function() { … }); // combined verbs
 
-The **URL** respects the [path syntax](#paths). Anyway, to match the root, you’ll need to set the URL as ‘/’. Note that [GET parameters](#get-parameters) aren’t part of the route. 
+The **URL** respects the [path syntax](#paths). Anyway, to match the root, you’ll need to set the URL as ‘/’. Note that [GET parameters](#get-parameters) aren’t part of the route.  
+Combine verbs using the `|` separator.
 	
 ### Wrappers
 You can also configure routes by using the wrappers:
@@ -78,7 +79,7 @@ URL parameters are passed to the callback function in the order they are specifi
 		echo uri('id'); // displays “134”, global scope
 	});
 	
-`uri( $key )` lets you access the parameters values from anywhere in the code. See [URI helper](#uri-helpers) for more information.
+`uri( $key )` lets you access the parameters values from anywhere in the code. See [URI helper](#uri-helper) for more information.
 
 	
 ## Tips
