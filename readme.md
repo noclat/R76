@@ -78,7 +78,7 @@ URL parameters are passed to the callback function in the order they are specifi
 		echo uri('id'); // displays “134”, global scope
 	});
 	
-`uri( $key )` let you access the parameter value from anywhere in the code. See [URI helper](#uri-helpers) for more information.
+`uri( $key )` lets you access the parameters values from anywhere in the code. See [URI helper](#uri-helpers) for more information.
 
 	
 ## Tips
