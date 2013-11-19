@@ -73,12 +73,12 @@ URL parameters are passed to the callback function in the order they are specifi
 
 	// current URL: //yoursite.com/projects/articles/134/
 	get('@category/articles/@id', function( $category, $id ) {
-		echo $category; // displays "projects"
-		echo $id; // displays “134”
-		echo uri('id'); // displays “134”
+		echo $category; // displays "projects", local scope
+		echo $id; // displays “134”, local scope 
+		echo uri('id'); // displays “134”, global scope
 	});
 	
-See [URI helper](#uri-helpers) for more information about `uri()` function.
+`uri( $key )` let you access the parameter value from anywhere in the code. See [URI helper](#uri-helpers) for more information.
 
 	
 ## Tips
