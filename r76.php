@@ -2,7 +2,7 @@
 # R76 by Nicolas Torres (ntorres.me), CC BY-SA license: creativecommons.org/licenses/by-sa/3.0
   class R76 { public static function __callstatic($func, array $args) { return call_user_func_array(array(R76_base::instance(), $func), $args); } }
   final class R76_base {
-    private static $instance; private $root, $path = array(), $callback = false;
+    private static $instance; private $root, $path = array(), $callback = array();
 
   # Parse URI and params & rewrite GET params (e.g. URI?search=terms&page=2 => URI/search:terms/page:2)
     public function __construct() {
