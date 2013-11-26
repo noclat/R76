@@ -22,9 +22,9 @@
 
   # Get URL: (void, void) -> current URL; (arr, void) -> current URL + updated GET params; (str, arr) -> new URL + new GET params
     public function url($uri = false, $get = array()) {
+      if ($uri === false) return '//'.$_SERVER['HTTP_HOST'].$_SERVER["REQUEST_URI"];
       if (is_array($uri)) $get = array_replace($_GET, $uri);
-      elseif ($uri === false) $get = $_GET;
-      return $this->root.(($uri !== false AND !is_array($uri))?trim($uri, "/ \t\n\r\0\x0B"):$this->uri()).(count($get)?'/'.strtr(http_build_query($get), '=&', ':/'):'');
+      return '//'.trim($this->root.(($uri !== false AND !is_array($uri))?trim($uri, "/ \t\n\r\0\x0B"):$this->uri()), '/').(count($get)?'/'.strtr(http_build_query($get), '=&', ':/'):'');
     }
     
   # Match route (e.g. GET|POST|PUT|DELETE, /path/with/@var, path/to/file.ext|func()|class->method()). Note: you can use '@var' in callbacks name.
