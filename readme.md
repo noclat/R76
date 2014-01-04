@@ -120,7 +120,7 @@ Returns the absolute protocol-free URL of a relative path. `url(‘articles/arch
 Returns the same URL, but changes the specified parameters. Example: the current URL is `article/read/4/showcomments:true/commentspage:3`.
 
 	echo url(array(
-		‘commentspage’ => 5
+		'commentspage' => 5
 	));
 
 will return the absolute URL of `article/read/4/showcomments:true/commentspage:5`.
@@ -128,9 +128,9 @@ will return the absolute URL of `article/read/4/showcomments:true/commentspage:5
 #### 1 string + 1 associative array parameters
 Returns the absolute URL, adding the parameters.
 
-	echo url(‘article/read/4’, array(
-		‘showcomments’ => ‘true’
-		‘commentspage’ => 1
+	echo url('article/read/4', array(
+		'showcomments' => 'true'
+		'commentspage' => 1
 	));
 
 will return `//yourdomain.com/article/read/4/showcomments:true/commentspage:1`.
