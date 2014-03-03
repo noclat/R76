@@ -1,7 +1,7 @@
 # R76 router
 R76 is a light-weight and lightning fast PHP router that can hold any kind of project. It does not require any design pattern.
 
-R76 is shared under a [CC BY-SA license](http://creativecommons.org/licenses/by-sa/3.0). 
+R76 is shared under the [MIT license](http://opensource.org/licenses/MIT). 
 
 See [Eye Fracture source](http://github.com/noclat/eyefracture.com) or [Aboard source](https://github.com/noclat/aboard.io) to get a real-life example of R76 usage.
 
