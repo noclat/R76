@@ -89,7 +89,7 @@ Any path you will have to write (in `url()` helper and the configuration methods
 **Note:** the URLs could be written both **with or without any extension**—`//example.com/sitemap` and `//example.com/sitemap.xml` would be equaly regarded. Make sure the extension doesn't appear in routing functions.
 
 ### Callbacks
-Callbacks could be files, anonymous functions, and function or method names. If it’s a file, it will just be included (and executed). If it’s a function or a method name, just pass the name, without the parenthesis. Examples: `readArticle`, `articles::read`, `article->read` — in this last case, the ‘article’ class will be instanciated and the `__construct()` method will be triggered.
+Callbacks could be files, anonymous functions, and function or method names. If it’s a file, it will just be included (and executed). If it’s a function or a method name, just pass the name, without the parenthesis. Examples: `article.php`, `readArticle`, `articles::read`, `article->read` — in this last case, the ‘article’ class will be instanciated and the `__construct()` method will be triggered.
 
 **Note**: use `return false;` in a callback to cancel it and trigger the default callback instead.
 
