@@ -3,8 +3,6 @@ R76 is a light-weight and lightning fast PHP router that can hold any kind of pr
 
 R76 is shared under the [MIT license](http://opensource.org/licenses/MIT). 
 
-See [Eye Fracture source](http://github.com/noclat/eyefracture.com) for a real-life example of R76 usage.
-
 Special thanks to [dhoko](http://github.com/dhoko) for his feedbacks.
 
 # Documentation
