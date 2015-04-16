@@ -6,7 +6,7 @@
 
   # Parse URI and params & rewrite GET params (e.g. URI?search=terms&page=2 => URI/search:terms/page:2)
     public function __construct() {
-      if (count($_GET)) { header('location://'.trim(strstr($_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'], '?', true), '/').'/'.strtr(http_build_query($_GET), '=&', ':/')); exit; }
+      if (count($_GET)) { header('location://'.trim(strstr($_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'], '?', true), '/').'/'.strtr(http_build_query(array_map(function($v) { return empty($v)?'true':$v; }, $_GET)), '=&', ':/')); exit; }
       $this->root = '//'.trim($_SERVER['HTTP_HOST'].dirname($_SERVER['PHP_SELF']), '/').'/';
       $uri = explode('/', trim(substr('//'.$_SERVER['HTTP_HOST'].$_SERVER["REQUEST_URI"], strlen($this->root)), '/'));
       foreach ($uri as $chunk) if (strpos($chunk, ':') !== false) { list ($k, $v) = explode(':', $chunk); $_GET[$k] = trim(urldecode($v)); }
