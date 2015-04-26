@@ -94,13 +94,13 @@ Callbacks could be files, anonymous functions, and function or method names. If 
 ### GET parameters
 GET parameters aren’t part of the route. Any callback of `/articles/archives` url and `/articles/archives/sort:year%20asc` will be the same. You can access those parameters in your code to make changes according to their values.
 
-Note: GET parameters will be automatically rewrited from `?key=value&key2=value2` to `/key:value/key2:value2`, but still available using `$_GET` superglobal.
+**Note**: GET parameters will be automatically rewrited from `?key=value&key2=value2` to `/key:value/key2:value2`, but still available using `$_GET` superglobal.
 
 ### Before and after route callbacks
 Anything above `run()` will be executed before the route callback, and anything below `run()` will be executed after the route callback.
 
 ## Helpers
-Some values and functions are avaiable to manipulate anything related to URLs and template files. Those functions are avaible in all your files.
+Some values and functions are available to manipulate anything related to URLs and template files. Those functions are avaible in all your files.
 
 <a name="root-helper"/>
 ### root()
