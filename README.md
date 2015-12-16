@@ -1,7 +1,8 @@
 # R76 router
-R76 is a light-weight and lightning fast PHP router that can hold any kind of project. It does not require any design pattern.
 
-R76 is shared under the [MIT license](http://opensource.org/licenses/MIT). 
+[![MIT license](https://img.shields.io/badge/license-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
+
+R76 is a light-weight and lightning fast PHP router that can hold any kind of project. It does not require any design pattern.
 
 Special thanks to [dhoko](http://github.com/dhoko) for his feedbacks.
 
