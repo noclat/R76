@@ -7,25 +7,25 @@ R76 is a light-weight and lightning fast PHP router that can hold any kind of pr
 Special thanks to [dhoko](http://github.com/dhoko) for his feedbacks.
 
 # Documentation
-- [Getting started](#getting-started)
-- [Routes](#routes)
-	- [Wrappers](#wrappers)
-	- [Parameters](#parameters)
-- [Tips](#tips)
-	- [Paths](#paths)
-	- [Callbacks](#callbacks)
-	- [GET parameters](#get-parameters)
-	- [Before and after route callbacks](#before-and-after-route-callbacks)
-- [Helpers](#helpers)
-	- [root()](#root-helper)
-	- [url( …? )](#url-helper)
-	- [uri( $key? )](#uri-helper)
-	- [verb()](#verb-helper)
-	- [async()](#async-helper)
-	- [load( $path )](#load-helper)
-	- [go( $url? )](#go-helper)
+- [1. Getting started](#getting-started)
+- [2. Routes](#routes)
+	- [2.1. Wrappers](#wrappers)
+	- [2.2. Parameters](#parameters)
+- [3. Tips](#tips)
+	- [3.1. Paths](#paths)
+	- [3.2. Callbacks](#callbacks)
+	- [3.3. GET parameters](#get-parameters)
+	- [3.4. Before and after route callbacks](#before-and-after-route-callbacks)
+- [4. Helpers](#helpers)
+	- [4.1. root()](#root-helper)
+	- [4.2. url( …? )](#url-helper)
+	- [4.3. uri( $key? )](#uri-helper)
+	- [4.4. verb()](#verb-helper)
+	- [4.5. async()](#async-helper)
+	- [4.6. load( $path )](#load-helper)
+	- [4.7. go( $url? )](#go-helper)
 
-## Getting started
+## 1. Getting started
 Start creating an `index.php` file at the top level. Include `r76.php`.
 
 All requests are redirected to `index.php`. Here is an example of what it should looks like:
@@ -51,7 +51,7 @@ run(function() {
 
 The `run()` function displays the result, and gets a callback in parameter, called when the URL doesn’t match any route configuration. See the [Callbacks section](#callbacks) below to know more about what is posssible to do with.
 
-## Routes
+## 2. Routes
 After including `r76.php`, and before calling `run()` that will display your page, you may need to configure routes callback:
 
 ```php
@@ -64,7 +64,7 @@ on('GET|POST|PUT|DELETE', '/form', function() { … }); // combined verbs
 The **URL** respects the [path syntax](#paths). Anyway, to match the root, you’ll need to set the URL as ‘/’. Note that [GET parameters](#get-parameters) aren’t part of the route.  
 Combine verbs using the `|` separator.
 	
-### Wrappers
+### 2.1. Wrappers
 You can also configure routes by using the wrappers:
 
 ```php
@@ -75,7 +75,7 @@ put('/route/path', $callback);
 delete('/route/path', $callback);
 ```
 	
-### Parameters
+### 2.2. Parameters
 
 URL parameters are passed to the callback function in the order they are specified.
 
@@ -92,34 +92,34 @@ get('@category/articles/@id', function( $category, $id ) {
 `uri( $key )` lets you access the parameters values from anywhere in the code. See [URI helper](#uri-helper) for more information.
 
 	
-## Tips
-### Paths
+## 3. Tips
+### 3.1. Paths
 Any path you will have to write (in `url()` helper and the configuration methods) are parsed to prevent from any bug occuring with the ‘slash’ character confusing use. So you can both write `/path/` or `path/`, and even `path`.  
 
 **Note:** the URLs could be written both **with or without any extension**—`//example.com/sitemap` and `//example.com/sitemap.xml` would be equaly regarded. Make sure the extension doesn't appear in routing functions.
 
-### Callbacks
+### 3.2. Callbacks
 Callbacks could be files, anonymous functions, and function or method names. If it’s a file, it will just be included (and executed). If it’s a function or a method name, just pass the name, without the parenthesis. Examples: `article.php`, `readArticle`, `articles::read`, `article->read` — in this last case, the ‘article’ class will be instanciated and the `__construct()` method will be triggered.
 
 **Note**: use `return false;` in a callback to cancel it and trigger the default callback instead.
 
-### GET parameters
+### 3.3. GET parameters
 GET parameters aren’t part of the route. Any callback of `/articles/archives` url and `/articles/archives/sort:year%20asc` will be the same. You can access those parameters in your code to make changes according to their values.
 
 **Note**: GET parameters will be automatically rewrited from `?key=value&key2=value2` to `/key:value/key2:value2`, but still available using `$_GET` superglobal.
 
-### Before and after route callbacks
+### 3.4. Before and after route callbacks
 Anything above `run()` will be executed before the route callback, and anything below `run()` will be executed after the route callback.
 
-## Helpers
+## 4. Helpers
 Some values and functions are available to manipulate anything related to URLs and template files. Those functions are avaible in all your files.
 
 <a name="root-helper"/>
-### root()
+### 4.1. root()
 Returns the complete adress of your website.
 
 <a name="url-helper"/>
-### url( …? ) 
+### 4.2. url( …? ) 
 #### 0 parameter
 Returns the complete current URL.
 
@@ -152,7 +152,7 @@ echo url('article/read/4', array(
 will return `//yourdomain.com/article/read/4/showcomments:true/commentspage:1`.
 
 <a name="uri-helper"/>
-### uri( $key? )
+### 4.3. uri( $key? )
 #### 0 parameter
 Returns the current URI, which is the URL freed from root and GET parameters.
 
@@ -179,17 +179,17 @@ echo uri(2); // displays “134”
 ```
 
 <a name="verb-helper"/>
-### verb()
+### 4.4. verb()
 Returns the current verb (GET, POST, PUT, DELETE). Note: it returns the value of the `$_SERVER[‘REQUEST_METHOD’]` server variable.
   
 <a name="async-helper"/>
-### async()
+### 4.5. async()
 Returns true if you’re using an AJAX request, and false if not. What defines an AJAX request is the value of the `X_REQUESTED_WITH` header set to `XMLHttpRequest`, used in nearly all of the JavaScript libraries that send AJAX requests.
 
 <a name="load-helper"/>
-### load( $path )
+### 4.6. load( $path )
 Includes all the php files located in the given folder path.
 
 <a name="go-helper"/>
-### go( $url? )
+### 4.7. go( $url? )
 Redirects to the specified URL. If `$url` parameter is ommited, it will refresh the current page, using `url()` value.
