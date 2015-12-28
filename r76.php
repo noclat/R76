@@ -1,5 +1,5 @@
 <?php
-# R76 by Nicolas Torres (github.com/noclat), MIT license: opensource.org/licenses/MIT
+# R76 by Nicolas Torres: github.com/noclat (MIT license)
   class R76 { public static function __callstatic($func, array $args) { return call_user_func_array(array(R76_base::instance(), $func), $args); } }
   final class R76_base {
     private static $instance; private $root, $path = array(), $callback = array();
